@@ -169,9 +169,22 @@ def sous_hexagone(grille: Grid, taille_grille:int, num:int) -> Grid:
         pos = get_coord(element_case)
         if abs(pos[0]) <= num and abs(pos[1]) <= num and abs(pos[2]) <= num:
             sous_grille.append(element_case)
+
     # print("Num", num)
+
     # print("Grille", sous_grille)
     return sous_grille
+
+
+def sous_hexagone_3(grille: Grid, element_case : Case) -> Grid:
+    """renvoie la grille de taille 3 extraite de la grille initiale"""
+    voisin = voisins(grille, Position)
+    return [case] + voisin
+
+
+
+    
+    
 
 
 def jouer_random_random(taille_grille:int = 4) -> Joueur:
@@ -182,8 +195,8 @@ def jouer_random_random(taille_grille:int = 4) -> Joueur:
     premier_coup=True
     while True : 
         if a_gagne(grille, joueur) and premier_coup == False: 
-            print("Felicitation, le joueur," ,joueur, "A gagné")
-            print("Score final : ", score)
+            # print("Felicitation, le joueur," ,joueur, "A gagné")
+            # print("Score final : ", score)
             break
         #changer de joueur
 
@@ -195,10 +208,10 @@ def jouer_random_random(taille_grille:int = 4) -> Joueur:
         # print(liste_coup_legaux(grille, joueur))
         grille = jouer_random(grille, joueur, premier_coup)
         premier_coup = False
-        for num in range(2, taille_grille):
-            if a_gagne(sous_hexagone(grille, taille_grille, num), joueur):
+
+        for element_case in grille:
+            if a_gagne(sous_hexagone_3(grille, element_case), joueur):
                 score[joueur] += 1
-        # print("Joueur", joueur, "a joué")
     return joueur, score
 
 
@@ -215,12 +228,15 @@ def test(N, taille):
                 compteur += 1
     return compteur/N
 
-X, Y = [], []
-for i in range(3, 5):
-    X.append(i)
-    Y.append(test(200, i))
-plt.plot(X, Y)
-plt.show()
+
+print(test(500, 4))
+
+# X, Y = [], []
+# for i in range(3, 5):
+#     X.append(i)
+#     Y.append(test(200, i))
+# plt.plot(X, Y)
+# plt.show()
 
 
 
@@ -245,8 +261,6 @@ plt.show()
 #          return bestValue
 
 def minmax(grid:Grid, joueur : Joueur, maxi_player:bool=True) -> int:
-
-
     if a_gagne(grid, joueur):
         return 1
     elif a_gagne(grid,joueur):
@@ -266,6 +280,10 @@ def minmax(grid:Grid, joueur : Joueur, maxi_player:bool=True) -> int:
                 val = minmax(grid, joueur, True)
                 meilleur_val = min(meilleur_val, val)
             return meilleur_val
+
+
+
+
 
 
 
