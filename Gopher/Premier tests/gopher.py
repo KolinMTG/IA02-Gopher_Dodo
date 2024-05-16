@@ -6,6 +6,7 @@ from typing import List, Tuple
 import math as m
 import tkinter as tk
 import itertools as itr
+from xml.dom.minidom import Element
 import matplotlib.pyplot as plt
 import random as rd
 
@@ -47,8 +48,7 @@ def generer_grid_vide(taille : int) -> Grid :
             grille.append(case(q,r,s, 0))
     return grille
 
-#!teste
-# print(generer_grid_vide(4))
+
 
 
 def voisins(grille : Grid, pos:Position) -> List[Case]:
@@ -81,13 +81,15 @@ def est_legal(grille: Grid, coup : Coup) -> bool:
     compteur = 0 #va servir a compter le nombre de case adverses voisines
     assert joueur == Bleu or joueur == Rouge #verifier que c'est soit le joueur 1 soit le joueur 2
     liste_voisin = voisins(grille, coup[0])
-
+    print("NOUVEAU COUP",coup)
+    print("LISTE VOISINS:",liste_voisin)
     for element_case in grille:
         if pos == get_coord(element_case) and get_value(element_case) != 0:
             return False #si la case est deja joué
 
     for element_case in liste_voisin:
         
+        '''A REFAIRE ICI'''
         if (get_value(element_case) == 2 and joueur == 1) or (get_value(element_case) == 1 and joueur == 2) :
             compteur +=1 #on a trouvé une case adverse adjacente à notre case
         if get_value(element_case) == joueur : 
@@ -96,6 +98,7 @@ def est_legal(grille: Grid, coup : Coup) -> bool:
             return False #si la case est adjacente à au moins 2 case deja joué par l'adversère
     if compteur == 0 :
         return False #si la case n'est adajcente à aucune case
+        '''A REFAIRE ICI'''
     return True
 
 
@@ -126,6 +129,7 @@ def jouer_random(grille: Grid, joueur: Joueur, premier_coup : bool) -> Grid:
     else:
         coup = (0,0,0), joueur
         return jouer_coup(grille, coup)
+
 
 def jouer_humain(grille: Grid, joueur: Joueur, premier_coup : bool) -> Grid:
     #demander graphiquement au joueur1 de donner une position 
@@ -212,6 +216,10 @@ def jouer_random_random(taille_grille:int = 4) -> Joueur:
         for element_case in grille:
             if a_gagne(sous_hexagone_3(grille, element_case), joueur):
                 score[joueur] += 1
+<<<<<<< HEAD
+=======
+        #print("Joueur", joueur, "a joué")
+>>>>>>> b5554bd8c49069f44f9b256c3bbd6bf31a0c5f68
     return joueur, score
 
 
@@ -228,9 +236,12 @@ def test(N, taille):
                 compteur += 1
     return compteur/N
 
+<<<<<<< HEAD
 
 print(test(500, 4))
 
+=======
+>>>>>>> b5554bd8c49069f44f9b256c3bbd6bf31a0c5f68
 # X, Y = [], []
 # for i in range(3, 5):
 #     X.append(i)
@@ -261,35 +272,46 @@ print(test(500, 4))
 #          return bestValue
 
 def minmax(grid:Grid, joueur : Joueur, maxi_player:bool=True) -> int:
+<<<<<<< HEAD
+=======
+    '''implémentation naïve de l'algorithme minmax'''
+>>>>>>> b5554bd8c49069f44f9b256c3bbd6bf31a0c5f68
     if a_gagne(grid, joueur):
+        print("JE SUIS LA")
         return 1
-    elif a_gagne(grid,joueur):
-        return -1
     else:
         if maxi_player:
-            meilleur_val = m.inf
+            print(meilleur_val)
+            meilleur_val = -m.inf
             for coup in liste_coup_legaux(grid, joueur):
                 grid = jouer_coup(grid, coup)
                 val = minmax(grid, joueur, False)
                 meilleur_val = max(meilleur_val, val)
             return meilleur_val
         else:
-            meilleur_val = -m.inf
+            meilleur_val = m.inf
+            print(meilleur_val)
             for coup in liste_coup_legaux(grid, joueur):
                 grid = jouer_coup(grid, coup)
                 val = minmax(grid, joueur, True)
                 meilleur_val = min(meilleur_val, val)
+                
             return meilleur_val
 
 
+<<<<<<< HEAD
 
 
 
 
 
+=======
+>>>>>>> b5554bd8c49069f44f9b256c3bbd6bf31a0c5f68
 # grid = generer_grid_vide(4)
 # grid = jouer_coup(grid, ((0,0,0),1))
 # print(minmax(grid, Rouge, False))
+
+print(minmax(generer_grid_vide(5),1,True))     
 
 
 
