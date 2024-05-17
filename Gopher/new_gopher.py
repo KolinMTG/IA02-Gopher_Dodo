@@ -115,6 +115,16 @@ def liste_coup_legaux(grille:Grids, joueur:Player) -> list[ActionGopher]:
     return liste_coups
 
 
+def a_perdu(grille:Grids, joueur:Player) -> bool:
+    """Renvoie True si le joueur a perdu et False sinon"""
+    return liste_coup_legaux(grille, joueur) == []
+
+
+    
+
+
+
+
 
 
     
