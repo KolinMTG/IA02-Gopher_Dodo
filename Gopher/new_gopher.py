@@ -43,7 +43,7 @@ def init_grille(taille_grille: int) -> Grids:
     return grilles
 
 #!test
-print(init_grille(7))
+# print(init_grille(7))
 
 def voisins(grille:Grid_pos, pos:Cell) -> list[Cell]:
     """renvoie la liste des voisins d'une case donnée de grid_pos"""
@@ -120,20 +120,8 @@ def a_perdu(grille:Grids, joueur:Player) -> bool:
     return liste_coup_legaux(grille, joueur) == []
 
 
-    
 
-
-
-
-
-
-    
-    
-
-
-
-
-# def show_grid(grille:Grid) -> None:
+# def show_grid(grille:Grid_pos) -> None:
 #     """utilise tkinter pour afficher la grille de jeu"""
 #     root = tk.Tk()
 #     for i in range(len(grille)):
@@ -142,6 +130,19 @@ def a_perdu(grille:Grids, joueur:Player) -> bool:
 #                 label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
 #                 label.grid(row=i, column=j)
 #     root.mainloop()
+
+# def show_grid_value(grille:Grid_value) -> None:
+#     """utilise tkinter pour afficher la grille de jeu"""
+#     root = tk.Tk()
+#     for i in range(len(grille)):
+#         for j in range(len(grille[i])):
+#             label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
+#             label.grid(row=i, column=j)
+#     root.mainloop()
+
+#!test
+# show_grid(init_grille(7)[0])
+# show_grid_value(init_grille(7)[1])
 
 
 
