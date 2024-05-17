@@ -35,7 +35,31 @@ def init_grille(taille_grille: int) -> Grid:
         compteur +=1
     return grille
 
-print(init_grille(57))
+#!test
+#print(init_grille(7))
+
+def voisins(grille:Grid, pos:Cell) -> list[Cell]:
+    """renvoie la liste des voisins d'une case donnée"""
+    taille_max_array = np.shape(grille)[0] //2-1
+    x, y = pos
+    liste_absolue = [(x, y-1), (x, y+1), (x+1, y), (x-1, y), (x+1, y+1), (x-1, y-1)]
+    liste_voisins =[]
+    for element in liste_absolue:
+        if (element[0]*element[1]>=0 or abs(element[0])+abs(element[1])<=taille_max_array) and ((abs(element[0])<=taille_max_array) and (abs(element[1])<=taille_max_array)):
+            liste_voisins.append(element)
+    return liste_voisins
+
+#!test
+# print(voisins(init_grille(7), (6,6)))
+# print(voisins(init_grille(7), (0,0)))
+#print(voisins(init_grille(7), (3, -3)))
+
+
+
+def est_legal(grille:Grid, coup:ActionGopher):
+    """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
+
+
 
 
 # def show_grid(grille:Grid) -> None:
