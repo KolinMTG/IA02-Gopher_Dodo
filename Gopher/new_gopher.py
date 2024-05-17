@@ -3,9 +3,10 @@ from typing import Union
 import pprint 
 import tkinter as tk
 # Types de base utilisés par l'arbitre
-Grid_pos = np.ndarray # Grille de jeu (tableau 2D de cases)
-Grid_value = np.ndarray
-Grids = tuple[Grid_pos, Grid_value]
+Grid_pos = np.ndarray # Grille de jeu (tableau 2D de cases), 
+#chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
+Grid_value = np.ndarray # Grille de jeu (tableau 2D de GameValue)
+Grids = tuple[Grid_pos, Grid_value] # Ensemble des deux grilles (la grille de coordonnées et la grille de valeurs)
 GameValue = int # Valeur d'une case (0, 1 ou 2)
 # Environment = ... # Ensemble des données utiles (cache, état de jeu...) pour
 #               # que votre IA puisse jouer (objet, dictionnaire, autre...)
@@ -19,6 +20,7 @@ Score = int
 Time = int
 
 EMPTY = 0
+
 
 def init_grille(taille_grille: int) -> Grids:
     """Initialise la grille de jeu avec des cases vides."""
@@ -44,7 +46,7 @@ def init_grille(taille_grille: int) -> Grids:
 print(init_grille(7))
 
 def voisins(grille:Grid_pos, pos:Cell) -> list[Cell]:
-    """renvoie la liste des voisins d'une case donnée"""
+    """renvoie la liste des voisins d'une case donnée de grid_pos"""
     taille_max_array = np.shape(grille[0])[0] //2-1
     x, y = pos
     liste_absolue = [(x, y-1), (x, y+1), (x+1, y), (x-1, y), (x+1, y+1), (x-1, y-1)]
@@ -73,13 +75,14 @@ def get_value(grille:Grid_value, pos:Cell) -> GameValue:
 # print(get_value(init_grille(7)[1], (0,0)))
 # print(get_value(init_grille(7)[1], (6,6)))
 
+
 def put_value(grille:Grid_value, pos:Cell, value:GameValue) -> Grid_value:
     """modifie la valeur d'une case donnée de position tuple pos"""
-    taille_max_array = np.shape(grille)[0] //2-1
-    x, y = pos
-    x += taille_max_array
+    taille_max_array = np.shape(grille)[0] //2-1 
+    x, y = pos #recuperation de la postion 
+    x += taille_max_array #conversion vers la position dans le tableau_value
     y += taille_max_array
-    grille[x, y] = value
+    grille[x, y] = value #recuperation du tableau value
     return grille
 
 
