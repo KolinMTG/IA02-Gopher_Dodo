@@ -81,13 +81,13 @@ def get_value(grille:Grid_value, pos:Cell) -> GameValue:
 # print(get_value(init_grille(7)[1], (6,6)))
 
 
-def put_value(grille:Grid_value, pos:Cell, value:GameValue) -> Grid_value:
+def play_action(grille:Grid_value, action: ActionGopher, player : Player) -> Grid_value:
     """modifie la valeur d'une case donnée de position tuple pos"""
     taille_max_array = np.shape(grille)[0] //2-1 
-    x, y = pos #recuperation de la postion 
+    x, y = action #recuperation de la postion 
     x += taille_max_array #conversion vers la position dans le tableau_value
     y += taille_max_array
-    grille[x, y] = value #recuperation du tableau value
+    grille[x, y] = player #modification de la valeur de la case dans la grille value
     return grille
 
 
@@ -143,15 +143,6 @@ def final(grille:Grids) -> Score:
 #                 label.grid(row=i, column=j)
 #     root.mainloop()
 
-# def show_grid_value(grille:Grid_value) -> None:
-#     """utilise tkinter pour afficher la grille de jeu"""
-#     root = tk.Tk()
-#     for i in range(len(grille)):
-#         for j in range(len(grille[i])):
-#             label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
-#             label.grid(row=i, column=j)
-#     root.mainloop()
-
 #!test
 # show_grid(init_grille(7)[0])
 # show_grid_value(init_grille(7)[1])
@@ -191,7 +182,7 @@ def memoize(fonction):
     return g
 
 @memoize
-def minmax_action_gopher(grid : Grids, player : Player) -> Tuple[Score, ActionGopher]:
+def minmax_action_gopher(grid : Grids, player : Player) -> tuple[Score, ActionGopher]:
     best_value_max = -INF
     best_value_min = INF
     best_action = None
@@ -201,7 +192,7 @@ def minmax_action_gopher(grid : Grids, player : Player) -> Tuple[Score, ActionGo
         return res, None
 
     for action in liste_coup_legaux(grid):
-        grid_suiv = play(grid, player, action)
+        grid_suiv =(grid[0], play_action(grid, action, player))
         if player == ROUGE:
             value = minmax_action_gopher(grid_suiv, BLEU)[0]
             if value > best_value_max:
@@ -218,6 +209,32 @@ def minmax_action_gopher(grid : Grids, player : Player) -> Tuple[Score, ActionGo
     else:
         return best_value_min, best_action
 
+
+
+# def rotate (grid: Grids) -> Grids:
+#     grid_pos = grid[0]
+#     grid_value = grid[1]
+#     taille_max_array = np.shape(grid_value)[0] //2-1
+#     new_grid_pos = np.full((2*taille_max_array+1, 2*taille_max_array+1), None)
+#     new_grid_value = np.full((2*taille_max_array+1, 2*taille_max_array+1), EMPTY)
+#     for i in range(2*taille_max_array+1):
+#         for j in range(2*taille_max_array+1):
+#             new_grid_pos[i][j] = (-grid_pos[j][i][1], grid_pos[j][i][0])
+#             new_grid_value[i][j] = grid_value[j][i]
+#     return (new_grid_pos, new_grid_value)
+
+# def show_grid_value(grille:Grid_value) -> None:
+#     """utilise tkinter pour afficher la grille de jeu"""
+#     root = tk.Tk()
+#     for i in range(len(grille)):
+#         for j in range(len(grille[i])):
+#             label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
+#             label.grid(row=i, column=j)
+#     root.mainloop()
+
+# #!test
+# show_grid_value(init_grille(7)[1])
+# show_grid_value(rotate(init_grille(7)))[1]
 
 
 
