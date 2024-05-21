@@ -2,6 +2,7 @@ import numpy as np
 from typing import Union
 import pprint 
 import tkinter as tk
+import random as rd
 # Types de base utilisés par l'arbitre
 Grid_pos = np.ndarray # Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -19,7 +20,12 @@ State = list[tuple[Cell, Player]] # État du jeu pour la boucle de jeu
 Score = int
 Time = int
 
+
+
+INF = 1000000
 EMPTY = 0
+ROUGE = 1
+BLEU = 2
 
 
 def init_grille(taille_grille: int) -> Grids:
@@ -67,7 +73,6 @@ def get_value(grille:Grid_value, pos:Cell) -> GameValue:
     x, y = pos
     x += taille_max_array
     y += taille_max_array
-    print(x, y)
     return grille[x, y]
 
 #!test
@@ -119,7 +124,14 @@ def a_perdu(grille:Grids, joueur:Player) -> bool:
     """Renvoie True si le joueur a perdu et False sinon"""
     return liste_coup_legaux(grille, joueur) == []
 
-
+def final(grille:Grids) -> Score:
+    """Renvoie le score de la partie pour le joueur ROUGE"""
+    if a_perdu(grille, ROUGE):
+        return -1
+    elif a_perdu(grille, BLEU):
+        return 1
+    else:
+        return 0
 
 # def show_grid(grille:Grid_pos) -> None:
 #     """utilise tkinter pour afficher la grille de jeu"""
@@ -143,6 +155,69 @@ def a_perdu(grille:Grids, joueur:Player) -> bool:
 #!test
 # show_grid(init_grille(7)[0])
 # show_grid_value(init_grille(7)[1])
+
+
+def jouer_aleatoir_aleatoir() -> Player:
+    """fait jouer deux aleatoires a gopher, renvoie le joueur gagnat"""
+    grille = init_grille(6)
+    print(grille[0])
+
+
+
+
+    # while not a_perdu(grille, joueur):
+    #     print("Joueur : ", joueur)
+    #     liste_coup = liste_coup_legaux(grille, joueur)
+    #     print("Liste des coups possibles : ", liste_coup)
+    #     coup = liste_coup[rd.randint(0, len(liste_coup)-1)]
+    #     print("Coup choisit : ", coup)
+    #     grille = (grille[0], put_value(grille[ROUGE], coup, joueur))
+    #     joueur = ROUGE if joueur == BLEU else BLEU #changement de joueur
+
+    # joueur = ROUGE if joueur == BLEU else BLEU
+
+jouer_aleatoir_aleatoir()
+
+
+def memoize(fonction):
+    cache = {} # closure
+    def g(state: State, player: Player):
+        if state in cache:
+            # print("Appel memoize")
+            return cache[state]
+        val = fonction(state, player)
+        cache[state] = val
+        return val
+    return g
+
+@memoize
+def minmax_action_gopher(grid : Grids, player : Player) -> Tuple[Score, ActionGopher]:
+    best_value_max = -INF
+    best_value_min = INF
+    best_action = None
+
+    res = final(grid) #renvoie le score si la partie est finie, 0 sinon
+    if res:
+        return res, None
+
+    for action in liste_coup_legaux(grid):
+        grid_suiv = play(grid, player, action)
+        if player == ROUGE:
+            value = minmax_action_gopher(grid_suiv, BLEU)[0]
+            if value > best_value_max:
+                best_value_max = value
+                best_action = action
+
+        elif player == BLEU:
+            value = minmax_action_gopher(grid_suiv, ROUGE)[0]
+            if value < best_value_min:
+                best_value_min = value
+                best_action = action
+    if player == ROUGE:
+        return best_value_max, best_action
+    else:
+        return best_value_min, best_action
+
 
 
 
