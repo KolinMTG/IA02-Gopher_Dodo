@@ -284,6 +284,6 @@ def best_taille_for_grid(grid: Grids, player: Player) -> list[list[Cell]]:
     '''Renvoie la taille de la sous-grille où la technique de minmax est la plus efficace'''
     matrice_taille = []
     taille = 1
-    max_taille = 50
+    max_taille = 50 #à voir s'il a mis une taille maximum pour la grille dans l'API.
     #à terminer...
     return matrice_taille
