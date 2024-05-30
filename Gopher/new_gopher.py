@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Union
-import pprint 
+import pprint
 import tkinter as tk
 import random as rd
 # Types de base utilisés par l'arbitre
