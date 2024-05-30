@@ -3,6 +3,8 @@ from typing import Union
 import pprint 
 import tkinter as tk
 import random as rd
+import multiprocessing as mp
+from math import *
 
 # Types de base utilisés par l'arbitre
 Grid_pos = np.ndarray # Grille de jeu (tableau 2D de cases), 
@@ -22,8 +24,7 @@ Score = int
 Time = int
 
 
-
-INF = 1000000
+INF = +inf
 EMPTY = 0
 ROUGE = 1
 BLEU = 2
@@ -246,8 +247,12 @@ def minmax_sousprob_gopher(grid: Grids, player: Player,centre: tuple[int,int],ta
     newgrid = []
     for i in range(centre[0]-taille,centre[0]+taille):
         for j in range(centre[1]-taille,centre[1]+taille):
-            if grid[i][j] != None:
+            try:
                 newgrid.append(grid[i][j]) #Une erreur est possible ici car grid[i][j] n'éxiste pas forcément.
+            except IndexError:
+                pass
+            else:
+                newgrid.append(None)
     return minmax_action_gopher(newgrid,player)
 
 def action_all_sous_prob(grid: Grids, player: Player, taille: int) -> list[tuple[Score,ActionGopher]]:
@@ -285,5 +290,15 @@ def best_taille_for_grid(grid: Grids, player: Player) -> list[list[Cell]]:
     matrice_taille = []
     taille = 1
     max_taille = 50 #à voir s'il a mis une taille maximum pour la grille dans l'API.
+    for i in range(taille,max_taille):
+        pass
     #à terminer...
     return matrice_taille
+
+# A FAIRE : 
+# OBTERNIR LE SERVEUR DE TEST
+# COMMENCER DODO (COUPS LEGAUX, MINMAX, SOUS-PROBLEMES) => ATTENTION HEURISTIQUE!
+# IMPLEMENTER MULTIPROCESSING (MULTITHREADING)
+
+# IMPLEMENTER DICTIONNAIRE COUP LEGAUX LOCAUX
+# TERMINER SOUS-PROBLEMES
