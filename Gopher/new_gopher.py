@@ -6,11 +6,11 @@ import random as rd
 import multiprocessing as mp
 from math import *
 # Types de base utilisés par l'arbitre
-Grid = np.ndarray # Grille de jeu (tableau 2D de cases), 
+Grid = List # Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
 GameValue = int # Valeur d'une case (0, 1 ou 2)
-Cell = tuple[int, int]
-Case = List[Cell, GameValue]
+Cell = Tuple[int, int]
+Case = Tuple[Cell, GameValue]
 
 
 ActionGopher = Cell
@@ -31,11 +31,13 @@ BLEU = 2
 
 #? UPDATE, j'ai ajouté un dico qui permet de convertir les coordonnées des cases de jeu en indice du tableau
 
-def init_grille(taille_grille: int) -> Grid:
+def init_grille(taille_grille: int) -> Tuple[Grid, Dict]:
     """Initialise la grille de jeu avec des cases vides."""
 
     taille_array = 2*taille_grille+1
-    grille = (np.full((taille_array, taille_array), [None, EMPTY]))
+    # grille = (np.full((taille_array, taille_array), [None, EMPTY], dtype=object))
+    # grille = [[[None, EMPTY] for _ in range(taille_array)] for _ in range(taille_array)]
+    grille = np.full((taille_array, taille_array), [None, EMPTY], dtype=object)
     compteur = taille_grille
     for i in range(taille_grille): #remplir la premiere partie
         for j in range(compteur, taille_array):
@@ -55,14 +57,17 @@ def init_grille(taille_grille: int) -> Grid:
         for num_col, case in enumerate(ligne):
             if case[0] != None:
                 dico_conversion[case[0]] = (num_ligne, num_col)
-            
 
     return grille, dico_conversion
 
 
 
 #!test
-#print(init_grille(7))
+print(init_grille(7))
+
+def existe(dico_conversion:Dict, pos:Cell) -> bool:
+    """Renvoie True si la case existe et False sinon"""
+    return pos in dico_conversion.keys()
 
 def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
     """renvoie la liste des voisins d'une case donnée de grid_pos"""
@@ -70,7 +75,7 @@ def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
     liste_absolue = [(x, y-1), (x, y+1), (x+1, y), (x-1, y), (x+1, y+1), (x-1, y-1)]
     liste_voisins = []
     for coord in liste_absolue: 
-        if coord in dico_conversion.keys(): #l'avantage est que si la case n'existe pas, on le sait car elle n'est pas dans le dico
+        if existe(dico_conversion, coord): #l'avantage est que si la case n'existe pas, on le sait car elle n'est pas dans le dico
             liste_voisins.append(grille[dico_conversion[coord]])
     return liste_voisins #renvoie les case !!! donc des listes[case, value]
 
@@ -80,6 +85,7 @@ def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
 # print(voisins(init_grille(7), (3, -3)))
 
 
+
 def play_action(grille:Grid,dico_conversion : Dict ,action: ActionGopher, player : Player) -> Grid:
     """modifie la valeur d'une case donnée de position tuple pos"""
     x, y = action #recuperation de la postion 
@@ -87,10 +93,15 @@ def play_action(grille:Grid,dico_conversion : Dict ,action: ActionGopher, player
     return grille
 
 
+
+
 def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : Player) -> bool:
     """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
 
     case_cible = grille[dico_conversion[action]]
+
+    if existe(dico_conversion, action) == False: #si la case n'existe pas alors le coup n'est pas légal
+        return False
 
     if case_cible[1] != EMPTY: #si la case n'est pas vide alors le coup n'est pas légal
         return False
@@ -107,7 +118,6 @@ def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : 
     return nb_case_adverse == 1 #il y a une seule case adjacente qui est à l'autre joueur 
 
 
-    
 def liste_coup_legaux(grille:Grid,dico_conversion:Dict, joueur:Player) -> list[ActionGopher]:
     """Renvoie la liste de tous les coups légaux pour un joueur donné"""
     liste_coups = []
@@ -274,15 +284,15 @@ def score_final(grille:Grid) -> Score: #permet à la fois de teste si le jeu est
 #         best_action = actionMinMax
 #     return best_action
 
-def best_taille_for_grid(grid: Grids, player: Player) -> list[list[Cell]]:
-    '''Renvoie la taille de la sous-grille où la technique de minmax est la plus efficace'''
-    matrice_taille = []
-    taille = 1
-    max_taille = 50 #à voir s'il a mis une taille maximum pour la grille dans l'API.
-    #à terminer...
-    for i in range(taille,max_taille):
-        pass
-    return matrice_taille
+# def best_taille_for_grid(grid: Grids, player: Player) -> list[list[Cell]]:
+#     '''Renvoie la taille de la sous-grille où la technique de minmax est la plus efficace'''
+#     matrice_taille = []
+#     taille = 1
+#     max_taille = 50 #à voir s'il a mis une taille maximum pour la grille dans l'API.
+#     #à terminer...
+#     for i in range(taille,max_taille):
+#         pass
+#     return matrice_taille
 
 # A FAIRE : 
 # OBTERNIR LE SERVEUR DE TEST
