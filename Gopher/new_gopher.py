@@ -29,15 +29,14 @@ BLEU = 2
 
 
 
+
 #? UPDATE, j'ai ajouté un dico qui permet de convertir les coordonnées des cases de jeu en indice du tableau
 
 def init_grille(taille_grille: int) -> Tuple[Grid, Dict]:
     """Initialise la grille de jeu avec des cases vides."""
 
     taille_array = 2*taille_grille+1
-    # grille = (np.full((taille_array, taille_array), [None, EMPTY], dtype=object))
-    # grille = [[[None, EMPTY] for _ in range(taille_array)] for _ in range(taille_array)]
-    grille = np.full((taille_array, taille_array), [None, EMPTY], dtype=object)
+    grille = [[[None, EMPTY] for _ in range(taille_array)] for _ in range(taille_array)]
     compteur = taille_grille
     for i in range(taille_grille): #remplir la premiere partie
         for j in range(compteur, taille_array):
@@ -60,10 +59,24 @@ def init_grille(taille_grille: int) -> Tuple[Grid, Dict]:
 
     return grille, dico_conversion
 
+# #!test
+# grille, dico_conversion = init_grille(7)
+# print("GRILLE", grille)
+# print("DICO", dico_conversion)
 
 
-#!test
-print(init_grille(7))
+def init_dico_legaux(dico_conversion:Dict) -> Tuple[Dict, Dict]:
+    """Initialise les dictionnaires des coup legaux des cases de jeu"""
+    dict_rouge = {}
+    dict_bleu = {}
+    for case in dico_conversion.keys():
+        dict_rouge[case] = False
+        dict_bleu[case] = False
+    return dict_rouge, dict_bleu
+
+# #!test
+# dict_legaux_rouge, dict_legaux_bleu = init_dico_legaux(init_grille(7)[1])
+# print(dict_legaux_rouge)
 
 def existe(dico_conversion:Dict, pos:Cell) -> bool:
     """Renvoie True si la case existe et False sinon"""
@@ -76,7 +89,8 @@ def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
     liste_voisins = []
     for coord in liste_absolue: 
         if existe(dico_conversion, coord): #l'avantage est que si la case n'existe pas, on le sait car elle n'est pas dans le dico
-            liste_voisins.append(grille[dico_conversion[coord]])
+            cell = dico_conversion[coord]
+            liste_voisins.append(grille[cell[0]][cell[1]])
     return liste_voisins #renvoie les case !!! donc des listes[case, value]
 
 #!test
@@ -85,94 +99,128 @@ def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
 # print(voisins(init_grille(7), (3, -3)))
 
 
-
-def play_action(grille:Grid,dico_conversion : Dict ,action: ActionGopher, player : Player) -> Grid:
-    """modifie la valeur d'une case donnée de position tuple pos"""
-    x, y = action #recuperation de la postion 
-    grille[dico_conversion[action]] = player #modification de la valeur de la case dans la grille value
-    return grille
-
-
-
-
 def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : Player) -> bool:
     """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
-
-    case_cible = grille[dico_conversion[action]]
-
-    if existe(dico_conversion, action) == False: #si la case n'existe pas alors le coup n'est pas légal
+    cell = dico_conversion[action]
+    case_cible = grille[cell[0]][cell[1]]
+    if existe(dico_conversion, action) == False: #*si la case n'existe pas alors le coup n'est pas légal
+        return False
+    if case_cible[1] != EMPTY: #*si la case n'est pas vide alors le coup n'est pas légal
         return False
 
-    if case_cible[1] != EMPTY: #si la case n'est pas vide alors le coup n'est pas légal
-        return False
-
-    liste_voisins = voisins(grille, dico_conversion, action)
-    nb_case_adverse = 0 #compter le nombre de case adjacentes qui sont à l'autre joueur
-    for voisin in liste_voisins:
-        if voisin[1] == joueur:
-            return False
-        elif voisin[1] != EMPTY: # si different de EMPTY et de joueur alors, c'est l'autre joueur qui est sur cette case
-            nb_case_adverse+= 1
-            if nb_case_adverse>1 :
-                return False #il y a au moins 2 cases adjacentes qui sont à l'autre joueur
-    return nb_case_adverse == 1 #il y a une seule case adjacente qui est à l'autre joueur 
 
 
-def liste_coup_legaux(grille:Grid,dico_conversion:Dict, joueur:Player) -> list[ActionGopher]:
-    """Renvoie la liste de tous les coups légaux pour un joueur donné"""
-    liste_coups = []
-    for ligne_case in grille:
-        for case_grille in ligne_case:
-            coup = case_grille[0] #un coup est associé à une case
-            if coup != None and est_legal(grille, dico_conversion,  coup, joueur):
-                liste_coups.append(coup)
-    return liste_coups
+def update_dico_legaux(grille:Grid, dico_conversion:Dict, dict_legaux:Tuple[Dict,Dict], action : ActionGopher) -> Tuple[Dict, Dict]:
+    """Met a jour le dict_legaux en fonction du coup joué"""
+    #! ATTENTION : toujours le dico de coup legaux de ROUGE en premier et de BLEU en deuxieme !!!
+
+    dict_legaux[0][action] = False #on ne peut plus jouer sur la case qui à été jouée
+    dict_legaux[1][action] = False #on ne peut plus jouer sur la case qui à été jouée
+    
+    cases_voisins = voisins(grille, dico_conversion, action)
+    for case in cases_voisins:
+        if est_legal(grille, dico_conversion, case[0], ROUGE):
+            dict_legaux[0][case[0]] = True
+        if est_legal(grille, dico_conversion, case[0], BLEU):
+            dict_legaux[1][case[0]] = True
+    return dict_legaux
+
+def liste_coup_legaux(dict_legaux:Tuple[Dict, Dict], joueur: Player) -> list[ActionGopher]:
+    """renvoie la liste des coups légaux pour un joueur donné"""
+    assert joueur == ROUGE or joueur == BLEU
+    if joueur == ROUGE:
+       return [key for key in dict_legaux[0].keys() if dict_legaux[0][key] == True]
+    #litteralement les clé du tableau tel que la valeur associée est True
+
+    else:
+        return [key for key in dict_legaux[1].keys() if dict_legaux[1][key] == True]
+    #litteralement les clé du tableau tel que la valeur associée est True
 
 
-def a_perdu(grille:Grid,dico_conversion:Dict, joueur:Player) -> bool:
+
+
+
+def play_action(grille:Grid,dico_conversion : Dict ,action: ActionGopher, player : Player) -> Grid:
+    """joue une action legale et renvoie la grid, Attention, il faut que le coup soit légal"""
+    cell = dico_conversion[action]
+    grille[cell[0]][cell[1]][1] = player #modification de la valeur de la case dans la grille value
+    return grille
+
+def a_perdu(dict_legaux:Tuple[Dict, Dict], joueur:Player) -> bool:
     """Renvoie True si le joueur a perdu et False sinon"""
-    return liste_coup_legaux(grille,dico_conversion, joueur) == []
+    print("*************************************************** DICO LEGAUX ********************************************",dict_legaux, dict_legaux[0])
+    if joueur == ROUGE:
+        for value in dict_legaux[0].values():
+            if value == True:
+                return False
+        return True
+    else:
+        for value in dict_legaux[1].values():
+            if value == True:
+                return False
+        return True
 
-def score_final(grille:Grid) -> Score: #permet à la fois de teste si le jeu est dans un état final et de renvoyer le score
+def score_final(dict_legaux) -> Score: #permet à la fois de teste si le jeu est dans un état final et de renvoyer le score
     """Renvoie le score de la partie pour le joueur ROUGE"""
-    if a_perdu(grille, ROUGE):
+    if a_perdu(dict_legaux, ROUGE):
         return -1
-    elif a_perdu(grille, BLEU):
+    elif a_perdu(dict_legaux, BLEU):
         return 1
     else:
         return 0
 
-# def show_grid(grille:Grid_pos) -> None:
-#     """utilise tkinter pour afficher la grille de jeu"""
-#     root = tk.Tk()
-#     for i in range(len(grille)):
-#         for j in range(len(grille[i])):
-#             if grille[i][j] is not None:
-#                 label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
-#                 label.grid(row=i, column=j)
-#     root.mainloop()
-
-#!test
-# show_grid(init_grille(7)[0])
-# show_grid_value(init_grille(7)[1])
 
 
 
 
+def boucle_jeu_random():
+    """Boucle de jeu aléatoire"""
+    grille, dico_conversion = init_grille(7)
+    joueur = ROUGE
+    liste_coup = list(dico_conversion.keys()) #premier coup, tout les coup existant sont possible
+    coup = rd.choice(liste_coup)
+    grille = play_action(grille, dico_conversion, coup, joueur) #premier coup
+    dict_legaux = init_dico_legaux(dico_conversion)
+    dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup) #on met le dico des coups a jours
+
+    while not(score_final(dict_legaux)):
+        if joueur == ROUGE: joueur = BLEU #changement de joueur à chaque tour
+        else : joueur = ROUGE
+        #toujours dans cette ordre 
+        liste_coup = liste_coup_legaux(dict_legaux, joueur) #on regarde la liste des coups legaux pour le joueur
+        coup = rd.choice(liste_coup) #on en choisit un au hasard
+        grille = play_action(grille, dico_conversion, coup, joueur) 
+        dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup)
+    return score_final(grille)
 
 
-    # while not a_perdu(grille, joueur):
-    #     print("Joueur : ", joueur)
-    #     liste_coup = liste_coup_legaux(grille, joueur)
-    #     print("Liste des coups possibles : ", liste_coup)
-    #     coup = liste_coup[rd.randint(0, len(liste_coup)-1)]
-    #     print("Coup choisit : ", coup)
-    #     grille = (grille[0], put_value(grille[ROUGE], coup, joueur))
-    #     joueur = ROUGE if joueur == BLEU else BLEU #changement de joueur
+# #!test
+print(boucle_jeu_random())
 
-    # joueur = ROUGE if joueur == BLEU else BLEU
 
-# jouer_aleatoir_aleatoir()
+
+
+
+#! anciennement la version sans utiliser les dictionnaire de coup legaux
+# def liste_coup_legaux(grille:Grid,dico_conversion:Dict, joueur:Player) -> list[ActionGopher]:
+#     """Renvoie la liste de tous les coups légaux pour un joueur donné"""
+#     liste_coups = []
+#     for ligne_case in grille:
+#         for case_grille in ligne_case:
+#             coup = case_grille[0] #un coup est associé à une case
+#             if coup != None and est_legal(grille, dico_conversion,  coup, joueur):
+#                 liste_coups.append(coup)
+#     return liste_coups 
+
+
+
+
+
+
+
+
+
+
 
 
 # def memoize(fonction):
