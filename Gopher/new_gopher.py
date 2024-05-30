@@ -83,6 +83,11 @@ def existe(dico_conversion:Dict, pos:Cell) -> bool: #!OK
     """Renvoie True si la case existe et False sinon"""
     return pos in dico_conversion.keys()
 
+# #!test
+# print(existe(init_grille(6)[1], (0, 0))) #normalement True
+# print(existe(init_grille(6)[1], (7, 0))) #normalement False
+
+
 def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
     """renvoie la liste des voisins d'une case donnée de grid_pos"""
     x, y = pos #(x, y) = (0, 0) pour la case du milieu
@@ -92,6 +97,8 @@ def voisins(grille:Grid,dico_conversion : Dict, pos:Cell) -> List[Case]:
         if existe(dico_conversion, coord): #l'avantage est que si la case n'existe pas, on le sait car elle n'est pas dans le dico
             cell = dico_conversion[coord]
             liste_voisins.append(grille[cell[0]][cell[1]])
+        # else : print("Case inexistante", coord)
+    # print("Voisin", pos, liste_voisins)
     return liste_voisins #renvoie les case !!! donc des listes[case, value]
 
 #!test
@@ -104,23 +111,26 @@ def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : 
     """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
     cell = dico_conversion[action]
     case_cible = grille[cell[0]][cell[1]]
-    if existe(dico_conversion, action) == False: #*si la case n'existe pas alors le coup n'est pas légal
+    if not(existe(dico_conversion, action)): #si la case n'existe pas alors le coup n'est pas légal
         return False
-    if case_cible[1] != EMPTY: #*si la case n'est pas vide alors le coup n'est pas légal
+    if case_cible[1] != EMPTY: #si la case n'est pas vide alors le coup n'est pas légal
         return False
     
     nb_case_adverse = 0
+    
     cases_voisins = voisins(grille, dico_conversion, action)
     for case in cases_voisins:
-        if case [1] != joueur and case[1] != EMPTY:
+        if case[1] == joueur:
+            return False
+        elif case[1] != EMPTY: #si la case est adverse alors on incrémente le compteur
             nb_case_adverse += 1
             if nb_case_adverse >= 2:
                 return False
-    return case[1] > 0
+    return nb_case_adverse > 0
 
 
 
-def update_dico_legaux(grille:Grid, dico_conversion:Dict, dict_legaux:Tuple[Dict,Dict], action : ActionGopher) -> Tuple[Dict, Dict]:
+def update_dico_legaux(grille:Grid, dico_conversion:Dict, dict_legaux:Tuple[Dict,Dict], action : ActionGopher, joueur) -> Tuple[Dict, Dict]: #!OK
     """Met a jour le dict_legaux en fonction du coup joué"""
     #! ATTENTION : toujours le dico de coup legaux de ROUGE en premier et de BLEU en deuxieme !!!
 
@@ -132,10 +142,11 @@ def update_dico_legaux(grille:Grid, dico_conversion:Dict, dict_legaux:Tuple[Dict
     
     cases_voisins = voisins(grille, dico_conversion, action)
     for case in cases_voisins:
-        if est_legal(grille, dico_conversion, case[0], ROUGE):
+        if est_legal(grille, dico_conversion, case[0], ROUGE) and joueur != ROUGE:
             dict_legal_rouge[case[0]] = True
-        if est_legal(grille, dico_conversion, case[0], BLEU):
+        if est_legal(grille, dico_conversion, case[0], BLEU) and joueur != BLEU:
             dict_legal_bleu[case[0]] = True
+            
     return dict_legal_rouge, dict_legal_bleu
 
 def liste_coup_legaux(dict_legaux:Tuple[Dict, Dict], joueur: Player) -> List[ActionGopher]:
@@ -157,6 +168,7 @@ def liste_coup_legaux(dict_legaux:Tuple[Dict, Dict], joueur: Player) -> List[Act
 
 
 
+
 def play_action(grille:Grid,dico_conversion : Dict ,action: ActionGopher, player : Player) -> Grid:
     """joue une action legale et renvoie la grid, Attention, il faut que le coup soit légal"""
     cell = dico_conversion[action]
@@ -169,13 +181,11 @@ def a_perdu(dict_legaux:Tuple[Dict, Dict], joueur:Player) -> bool:
     dict_legal_bleu = dict_legaux[1]
    
     if joueur == ROUGE:
-        print("DICOLEGAUX_a_perdu_rouge", type(dict_legaux[0]))
         for value in list(dict_legal_rouge.values()):
             if value == True:
                 return False
         return True
     else :
-        print("DICOLEGAUX_a_perdu_bleu", type(dict_legaux[1]))
         for value in list(dict_legal_bleu.values()):
             if value == True:
                 return False
@@ -185,11 +195,9 @@ def a_perdu(dict_legaux:Tuple[Dict, Dict], joueur:Player) -> bool:
 def score_final(dict_legaux : Tuple[Dict, Dict]) -> Score: #permet à la fois de teste si le jeu est dans un état final et de renvoyer le score
     """Renvoie le score de la partie pour le joueur ROUGE"""
     if a_perdu(dict_legaux, ROUGE):
-        print("DICOLEGAUX_score_final", type(dict_legaux[0]))
         return -1
     
     elif a_perdu(dict_legaux, BLEU):
-        print("DICOLEGAUX_score_final", type(dict_legaux[0]))
         return 1
     else:
         return 0
@@ -198,29 +206,29 @@ def score_final(dict_legaux : Tuple[Dict, Dict]) -> Score: #permet à la fois de
 
 
 
-def boucle_jeu_random():
+def boucle_jeu_random(taille_grille:int = 6) -> Score:
     """Boucle de jeu aléatoire"""
-    grille, dico_conversion = init_grille(7)
+    grille, dico_conversion = init_grille(taille_grille)
     joueur = ROUGE
     liste_coup = list(dico_conversion.keys()) #premier coup, tout les coup existant sont possible
     coup = rd.choice(liste_coup)
     grille = play_action(grille, dico_conversion, coup, joueur) #premier coup
     dict_legaux = init_dico_legaux(dico_conversion)
-    dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup) #on met le dico des coups a jours
-    print("DICOLEGAUX 1", type(dict_legaux[0]))
+    dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup, joueur) #on met le dico des coups a jours
+    premier_coup = True
 
-    while not(score_final(dict_legaux)):
-        print("DICOLEGAUX_main_while", type(dict_legaux[0]))
+    while True:
+        premier_coup = False
         if joueur == ROUGE: joueur = BLEU #changement de joueur à chaque tour
         else : joueur = ROUGE
         #toujours dans cette ordre 
         liste_coup = liste_coup_legaux(dict_legaux, joueur) #on regarde la liste des coups legaux pour le joueur
-        print("LISTE COUP", liste_coup)
         coup = rd.choice(liste_coup) #on en choisit un au hasard
-        print("COUP", coup)
+        print("Joueur", joueur, "Coup", coup)
         grille = play_action(grille, dico_conversion, coup, joueur)
-        dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup)
-    return score_final(grille)
+        dict_legaux = update_dico_legaux(grille, dico_conversion, dict_legaux, coup, joueur)
+    
+    return score_final(dict_legaux)
 
 
 # #!test
