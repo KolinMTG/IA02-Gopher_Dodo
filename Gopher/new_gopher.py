@@ -3,6 +3,7 @@ from typing import Union
 import pprint
 import tkinter as tk
 import random as rd
+
 # Types de base utilisés par l'arbitre
 Grid_pos = np.ndarray # Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -49,7 +50,7 @@ def init_grille(taille_grille: int) -> Grids:
     return grilles
 
 #!test
-# print(init_grille(7))
+#print(init_grille(7))
 
 def voisins(grille:Grid_pos, pos:Cell) -> list[Cell]:
     """renvoie la liste des voisins d'une case donnée de grid_pos"""
@@ -237,6 +238,52 @@ def minmax_action_gopher(grid : Grids, player : Player) -> tuple[Score, ActionGo
 # show_grid_value(rotate(init_grille(7)))[1]
 
 
+### SOUS PROBLEMES GOPHER ###    
 
 
+def minmax_sousprob_gopher(grid: Grids, player: Player,centre: tuple[int,int],taille:int) -> tuple[Score,ActionGopher]:
+    '''Renvoie le meilleur coup possible dans le cas d'un sous-problème sur Gopher'''
+    newgrid = []
+    for i in range(centre[0]-taille,centre[0]+taille):
+        for j in range(centre[1]-taille,centre[1]+taille):
+            if grid[i][j] != None:
+                newgrid.append(grid[i][j]) #Une erreur est possible ici car grid[i][j] n'éxiste pas forcément.
+    return minmax_action_gopher(newgrid,player)
 
+def action_all_sous_prob(grid: Grids, player: Player, taille: int) -> list[tuple[Score,ActionGopher]]:
+    '''Réalise l'ensemble des sous_problèmes centrés sur les coups légaux et de taille taille'''
+    
+    liste_action = []
+    
+    for centres in est_legal(grid,player):
+        liste_action.append(minmax_sousprob_gopher(grid,player,centres,taille))
+    
+    ponderation_action={}
+    
+    for actions in liste_action:
+        if actions not in ponderation_action:
+            ponderation_action[actions] = 1
+        else:
+            ponderation_action[actions] += 1
+    
+    best_action=ponderation_action[0]
+    for pond_action in ponderation_action.items():
+        if pond_action[1]>best_action[1]:
+            best_action=pond_action[0]
+            
+    return best_action
+
+def test_sous_prob(actionMinMax: tuple[Score,ActionGopher], actionSousProblèmes: tuple[Score,ActionGopher]) -> tuple[Score,ActionGopher]:
+    '''Renvoie de l'action si les deux techniques sont d'accords'''
+    best_action = []
+    if actionMinMax == actionSousProblèmes:
+        best_action = actionMinMax
+    return best_action
+
+def best_taille_for_grid(grid: Grids, player: Player) -> list[list[Cell]]:
+    '''Renvoie la taille de la sous-grille où la technique de minmax est la plus efficace'''
+    matrice_taille = []
+    taille = 1
+    max_taille = 50 #à voir s'il a mis une taille maximum pour la grille dans l'API.
+    #à terminer...
+    return matrice_taille
