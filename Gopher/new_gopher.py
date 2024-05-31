@@ -5,6 +5,7 @@ import tkinter as tk
 import random as rd
 import multiprocessing as mp
 from math import *
+import itertools as it
 # Types de base utilisés par l'arbitre
 Grid = List # Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -231,8 +232,42 @@ def boucle_jeu_random(taille_grille:int = 6) -> Score:
     return score_final(dict_legaux)
 
 
-# #!test
-print(boucle_jeu_random())
+# # #!test
+# print(boucle_jeu_random())
+
+def get_case(grille : Grid,dico_conversion : Dict,cell : Cell) -> Case:
+    """prend en agrument, la grille, le dico de conversion et une cell"""
+    #Rappel : une cell est un tuple de deux int 
+    return grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+def rotation(grille):
+    """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
+
+def reflexion(grille, dico_conversion):
+    """effectue les reflexions d'une grille donnée, utile pour les symétries"""
+    taille_grille = len(grille)//2 
+    print(taille_grille)
+    ref_1 = init_grille(taille_grille)[0]
+    ref_2 = init_grille(taille_grille)[0]
+    ref_3 = init_grille(taille_grille)[0]
+
+    for case in it.chain(*ref_1): #enumeration de tout les element de la matrice
+        if case[0] != NDEF :
+            nouvelle_case = get_case(grille, dico_conversion, (case[0][1], case[0][0]))
+            ref_1[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    return ref_1
+
+
+#!test
+# print(init_grille(4)[0])
+# print(reflexion(init_grille(4)[0], init_grille(4)[1]))
+
+
+
+
+
+
+
 
 
 
