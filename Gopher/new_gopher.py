@@ -241,13 +241,57 @@ def get_case(grille : Grid,dico_conversion : Dict,cell : Cell) -> Case:
     #Rappel : une cell est un tuple de deux int 
     return grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
-def rotation(grille):
+def rotation(grille, dico_conversion):
     """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
+    taille_grille = len(grille)//2 
+    rot_1 = init_grille(taille_grille)[0]
+    rot_2 = copy.deepcopy(rot_1)
+    rot_3 = copy.deepcopy(rot_1)
+    rot_4 = copy.deepcopy(rot_1)
+    rot_5 = copy.deepcopy(rot_1)
+
+
+    for case in it.chain(*grille): #enumeration de tout les element de la matrice
+        if case[0] != NDEF :
+        
+        #!rotation 60°
+            new_cell = (case[0][1], case[0][1]-case[0][0])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            rot_1[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    
+        #!rotation 120°
+            new_cell = (case[0][1], case[0][1]-case[0][0])
+            nouvelle_case = get_case(rot_1, dico_conversion, new_cell)
+            rot_2[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    
+        #! rotation 180°
+            new_cell = (case[0][1], case[0][1]-case[0][0])
+            nouvelle_case = get_case(rot_2, dico_conversion, new_cell)
+            rot_3[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+
+        #! rotation 240°
+            new_cell = (case[0][1], case[0][1]-case[0][0])
+            nouvelle_case = get_case(rot_3, dico_conversion, new_cell)
+            rot_4[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    
+        #! rotation 300°
+            new_cell = (case[0][1], case[0][1]-case[0][0])
+            nouvelle_case = get_case(rot_4, dico_conversion, new_cell)
+            rot_5[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    
+    return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
+    
+#!test
+for rot in rotation(init_grille(7)[0], init_grille(7)[1]):
+    print("******************************ROT******************************")
+    print(rot)
+
+
+
 
 def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
     """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
     taille_grille = len(grille)//2 
-    print(taille_grille)
     ref_1 = init_grille(taille_grille)[0]
     ref_2 = copy.deepcopy(ref_1)
     ref_3 = copy.deepcopy(ref_1)
@@ -255,8 +299,6 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
     ref_5 = copy.deepcopy(ref_1)
     ref_6 = copy.deepcopy(ref_1)
 
-    
-    
     for case in it.chain(*grille): #enumeration de tout les element de la matrice
 
         #! symetrie axiale verticale
@@ -294,9 +336,12 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 
 
 #!test
-for ref in reflexion(init_grille(7)[0], init_grille(7)[1]):
-    print("******************************REF******************************")
-    print(ref)
+# for ref in reflexion(init_grille(7)[0], init_grille(7)[1]):
+#     print("******************************REF******************************")
+#     print(ref)
+
+
+
 
 
 
