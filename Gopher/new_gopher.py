@@ -6,6 +6,7 @@ import random as rd
 import multiprocessing as mp
 from math import *
 import itertools as it
+import copy
 # Types de base utilisés par l'arbitre
 Grid = List # Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -243,24 +244,62 @@ def get_case(grille : Grid,dico_conversion : Dict,cell : Cell) -> Case:
 def rotation(grille):
     """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
 
-def reflexion(grille, dico_conversion):
-    """effectue les reflexions d'une grille donnée, utile pour les symétries"""
+def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
+    """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
     taille_grille = len(grille)//2 
     print(taille_grille)
     ref_1 = init_grille(taille_grille)[0]
-    ref_2 = init_grille(taille_grille)[0]
-    ref_3 = init_grille(taille_grille)[0]
+    ref_2 = copy.deepcopy(ref_1)
+    ref_3 = copy.deepcopy(ref_1)
+    ref_4 = copy.deepcopy(ref_1)
+    ref_5 = copy.deepcopy(ref_1)
+    ref_6 = copy.deepcopy(ref_1)
 
-    for case in it.chain(*ref_1): #enumeration de tout les element de la matrice
+    
+    
+    for case in it.chain(*grille): #enumeration de tout les element de la matrice
+
+        #! symetrie axiale verticale
         if case[0] != NDEF :
-            nouvelle_case = get_case(grille, dico_conversion, (case[0][1], case[0][0]))
+            new_cell = (case[0][1], case[0][0])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
             ref_1[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
-    return ref_1
+    
+        #! symetrie axiale horizontale
+            new_cell = (-case[0][1], -case[0][0])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            ref_2[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+
+        #! symetrie axe bleu
+            new_cell = (-case[0][0], case[0][1]-case[0][0])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            ref_3[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+
+        #! symetrie axe rouge
+            new_cell = (case[0][0] - case[0][1], -case[0][1])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            ref_4[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+
+         #! autre axe 
+            new_cell = (case[0][0], case[0][0]-case[0][1])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            ref_5[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+    
+        #! autre axe 
+            new_cell = (case[0][1] - case[0][0], case[0][1])
+            nouvelle_case = get_case(grille, dico_conversion, new_cell)
+            ref_6[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+
+    return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
 
 
 #!test
-# print(init_grille(4)[0])
-# print(reflexion(init_grille(4)[0], init_grille(4)[1]))
+for ref in reflexion(init_grille(7)[0], init_grille(7)[1]):
+    print("******************************REF******************************")
+    print(ref)
+
+
+
 
 
 
