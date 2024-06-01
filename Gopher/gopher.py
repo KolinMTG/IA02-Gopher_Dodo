@@ -282,9 +282,9 @@ def rotation(grille, dico_conversion):
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 #!test
-for rot in rotation(init_grille(7)[0], init_grille(7)[1]):
-    print("******************************ROT******************************")
-    print(rot)
+# for rot in rotation(init_grille(7)[0], init_grille(7)[1]):
+#     print("******************************ROT******************************")
+#     print(rot)
 
 
 
@@ -342,40 +342,17 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 
 
 
+#! def grid_to_hash(grille:Grid) -> str:
+#!     """Renvoie le hash d'une grille donnée"""
 
+#! pour faire ca on prend la grille, pour chaque element de la grille, on transrofme en binaire sur 2 bits 
+#! on recup aussi la taille de la grille, qu on code sur 8 bits (histoire d'avoir de la marge, apres on peut aussi prendre 6, je pense qu'on depassera jamais 64 en taille de grille)
+#! chacun de ces codes binaires sont concaténés pour former le hash de la grille sous forme binaire,
+#! on convertit ensuite ce hash en hexadécimal pour avoir un hash plus lisible
+#! on renvoie l'hexa sous forme d'un string
 
-
-
-
-
-
-
-
-
-
-
-
-
-#! anciennement la version sans utiliser les dictionnaire de coup legaux
-# def liste_coup_legaux(grille:Grid,dico_conversion:Dict, joueur:Player) -> list[ActionGopher]:
-#     """Renvoie la liste de tous les coups légaux pour un joueur donné"""
-#     liste_coups = []
-#     for ligne_case in grille:
-#         for case_grille in ligne_case:
-#             coup = case_grille[0] #un coup est associé à une case
-#             if coup != None and est_legal(grille, dico_conversion,  coup, joueur):
-#                 liste_coups.append(coup)
-#     return liste_coups 
-
-
-
-
-
-
-
-
-
-
+#! def hash_to_grid(hash:str) -> Grid:
+#!     """Renvoie la grille correspondant à un hash donné"""
 
 
 # def memoize(fonction):
@@ -417,32 +394,6 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 #     else:
 #         return best_value_min, best_action
 
-
-
-# # def rotate (grid: Grids) -> Grids:
-# #     grid_pos = grid[0]
-# #     grid_value = grid[1]
-# #     taille_max_array = np.shape(grid_value)[0] //2-1
-# #     new_grid_pos = np.full((2*taille_max_array+1, 2*taille_max_array+1), None)
-# #     new_grid_value = np.full((2*taille_max_array+1, 2*taille_max_array+1), EMPTY)
-# #     for i in range(2*taille_max_array+1):
-# #         for j in range(2*taille_max_array+1):
-# #             new_grid_pos[i][j] = (-grid_pos[j][i][1], grid_pos[j][i][0])
-# #             new_grid_value[i][j] = grid_value[j][i]
-# #     return (new_grid_pos, new_grid_value)
-
-# # def show_grid_value(grille:Grid_value) -> None:
-# #     """utilise tkinter pour afficher la grille de jeu"""
-# #     root = tk.Tk()
-# #     for i in range(len(grille)):
-# #         for j in range(len(grille[i])):
-# #             label = tk.Label(root, text=f"{grille[i][j]}", borderwidth=1, relief="solid")
-# #             label.grid(row=i, column=j)
-# #     root.mainloop()
-
-# # #!test
-# # show_grid_value(init_grille(7)[1])
-# # show_grid_value(rotate(init_grille(7)))[1]
 
 
 # ### SOUS PROBLEMES GOPHER ###    
@@ -497,10 +448,11 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 #         pass
 #     return matrice_taille
 
-# A FAIRE : 
-# OBTERNIR LE SERVEUR DE TEST
-# COMMENCER DODO (COUPS LEGAUX, MINMAX, SOUS-PROBLEMES) => ATTENTION HEURISTIQUE!
-# IMPLEMENTER MULTIPROCESSING (MULTITHREADING)
+#TODO A FAIRE : 
+#TODO OBTERNIR LE SERVEUR DE TEST
+#TODO COMMENCER DODO (COUPS LEGAUX, MINMAX, SOUS-PROBLEMES) => ATTENTION HEURISTIQUE! 
+#TODO IMPLEMENTER MULTIPROCESSING (MULTITHREADING)
 
-# IMPLEMENTER DICTIONNAIRE COUP LEGAUX LOCAUX
-# TERMINER SOUS-PROBLEMES
+#TODO IMPLEMENTER DICTIONNAIRE COUP LEGAUX LOCAUX
+#TODO TERMINER SOUS-PROBLEMES
+#TODO IMPLEMENTER LES FONCTION DE HASHAGE
