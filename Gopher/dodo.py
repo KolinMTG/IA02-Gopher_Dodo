@@ -146,23 +146,19 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #!OK
         #!rotation 60°
             new_cell = (y_hex, y_hex-x_hex)
             rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-    
+
         #!rotation 120°
-            new_cell = (y_hex, y_hex-x_hex)
-            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-    
+            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_1[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+
         #! rotation 180°
-            new_cell = (y_hex, y_hex-x_hex)
-            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+            rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_2[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
 
         #! rotation 240°
-            new_cell = (y_hex, y_hex-x_hex)
-            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-    
+            rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_3[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+
         #! rotation 300°
-            new_cell = (y_hex, y_hex-x_hex)
-            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-    
+            rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_4[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 # #!test
@@ -193,50 +189,43 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #!OK
 
 
 
-# def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
-#     """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
-#     taille_grille = len(grille)//2 
-#     ref_1 = init_grille(taille_grille)[0]
-#     ref_2 = copy.deepcopy(ref_1)
-#     ref_3 = copy.deepcopy(ref_1)
-#     ref_4 = copy.deepcopy(ref_1)
-#     ref_5 = copy.deepcopy(ref_1)
-#     ref_6 = copy.deepcopy(ref_1)
+def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
+    """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
+    taille_grille = len(grille)//2 
+    ref_1 = init_grille_dodo(taille_grille)[0]
+    ref_2 = copy.deepcopy(ref_1)
+    ref_3 = copy.deepcopy(ref_1)
+    ref_4 = copy.deepcopy(ref_1)
+    ref_5 = copy.deepcopy(ref_1)
+    ref_6 = copy.deepcopy(ref_1)
 
-#     for case in it.chain(*grille): #enumeration de tout les element de la matrice
+    for x_hex, y_hex in dico_conversion.keys(): #enumeration de tout les element de la matrice
 
-#         #! symetrie axiale verticale
-#         if case[0] != NDEF :
-#             new_cell = (case[0][1], case[0][0])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_1[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+        #! symetrie axiale verticale
+        new_cell = (y_hex, x_hex)
+        ref_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
     
-#         #! symetrie axiale horizontale
-#             new_cell = (-case[0][1], -case[0][0])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_2[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+        #! symetrie axiale horizontale
+        new_cell = (-y_hex, -x_hex)
+        ref_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
 
-#         #! symetrie axe bleu
-#             new_cell = (-case[0][0], case[0][1]-case[0][0])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_3[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+        #! symetrie axe bleu
+        new_cell = (-x_hex, y_hex-x_hex)
+        ref_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
 
-#         #! symetrie axe rouge
-#             new_cell = (case[0][0] - case[0][1], -case[0][1])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_4[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+        #! symetrie axe rouge
+        new_cell = (x_hex - y_hex, -y_hex)
+        ref_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
 
-#          #! autre axe 
-#             new_cell = (case[0][0], case[0][0]-case[0][1])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_5[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+         #! autre axe 
+        new_cell = (x_hex, x_hex-y_hex)
+        ref_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
     
-#         #! autre axe 
-#             new_cell = (case[0][1] - case[0][0], case[0][1])
-#             nouvelle_case = get_case(grille, dico_conversion, new_cell)
-#             ref_6[dico_conversion[nouvelle_case[0]][0]][dico_conversion[nouvelle_case[0]][1]][1] = nouvelle_case[1]
+        #! autre axe 
+        new_cell = (y_hex - x_hex, y_hex)
+        ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
 
-#     return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
+    return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
 
 
 #!test
