@@ -356,7 +356,6 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 
 
 
-
 #! anciennement la version sans utiliser les dictionnaire de coup legaux
 # def liste_coup_legaux(grille:Grid,dico_conversion:Dict, joueur:Player) -> list[ActionGopher]:
 #     """Renvoie la liste de tous les coups légaux pour un joueur donné"""
