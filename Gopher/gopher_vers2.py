@@ -9,7 +9,7 @@ import multiprocessing as mp
 from math import *
 import itertools as it
 import copy
-import new_affichage as aff
+
 import matplotlib.pyplot as plt
 
 
@@ -221,12 +221,12 @@ def boucle_rd_rd(): # ! boucle de jeu OK
     return score_final(dico_legaux)
 
 #!test
-print(boucle_rd_rd())
+# print(boucle_rd_rd())
 
 
 
 
-
+print(init_grille_gopher(6)[0])
 
 
 
