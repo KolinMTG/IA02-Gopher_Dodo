@@ -223,9 +223,9 @@ def boucle_rd_rd(): # ! boucle de jeu OK
 
 ### Fonctions de hashage et de déhashage ###
 
-def hashing(gameValueGrid:Grid,taille: int) -> str:
+def hashing(gameValueGrid:list[list[GameValue]]) -> str:
     """Fonction de hashage d'une grille"""
-    hashage = str(taille)
+    hashage=""
     for Dimension in gameValueGrid:
         for GameValue in Dimension:
             if GameValue == ROUGE: #1
@@ -235,15 +235,13 @@ def hashing(gameValueGrid:Grid,taille: int) -> str:
             elif GameValue == EMPTY: #0
                 hashage+="0"
             else: #cas NDEF
-                hashage=hashage+"3"
-    return str(hex(int(hashage)))[2:]
+                hashage+="3"
+    return (str(hex(int(hashage)))[2:])
 
-def dehashing(hashage:str) -> list[list[GameValue]]:
+def dehashing(hashage:str,taille:int) -> list[list[GameValue]]:
     """Fonction de dehashage d'une grille"""
-    hashage=str(int(hashage,16))
     gameValueGrid=[]
-    taille=int(hashage[0])
-    hashage=hashage[1:]
+    hashage=str(int(hashage,16))
     for i in range(taille*2+1):
         gameValueGrid.append([])
         for j in range(taille*2+1):
@@ -282,15 +280,17 @@ def state_generator(taille:int) -> Grid:
             break
     return grille
 
-def test_hashage_dehashage(taille:int):
+def test_hashage_dehashage(taille:int) -> bool:
     """Teste la fonction de hashage et de déhashage"""
     grille=state_generator(taille)
-    hashage=hashing(grille,taille)
-    grille2=dehashing(hashage)
+    hashage=hashing(grille)
+    grille2=dehashing(hashage,taille)
     print(hashage)
-    print(grille)
-    print(grille2)
-    print(grille==grille2)
-        
-
-test_hashage_dehashage(6)
+    bool_test=(grille==grille2)
+    for elt in bool_test:
+        for booleen in elt:
+            if not(booleen):
+                return False
+    return True
+ 
+print(test_hashage_dehashage(15))
