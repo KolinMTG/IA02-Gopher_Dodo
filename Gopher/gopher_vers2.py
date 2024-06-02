@@ -1,5 +1,3 @@
-
-
 #! ---------------------- IMPORTS ---------------------- !#
 import numpy as np
 from typing import Union, List, Tuple, Dict
@@ -9,7 +7,7 @@ import multiprocessing as mp
 from math import *
 import itertools as it
 import copy
-import new_affichage as aff
+#import new_affichage as aff
 import matplotlib.pyplot as plt
 
 
@@ -217,22 +215,88 @@ def boucle_rd_rd(): # ! boucle de jeu OK
 
         if score_final(dico_legaux) != 0:
             break
-    aff.draw_hex_grid(grille)
+    #aff.draw_hex_grid(grille)
     return score_final(dico_legaux)
 
 #!test
-print(boucle_rd_rd())
+#print(boucle_rd_rd())
 
+### Fonctions de hashage et de déhashage ###
 
-
-
-
-
-
-
-    
+def hashing(gameValueGrid:Grid,taille: int) -> str:
+    """Fonction de hashage d'une grille"""
+    hashage = str(taille)
+    for Dimension in gameValueGrid:
+        for GameValue in Dimension:
+            if GameValue == ROUGE: #1
+                hashage+="01"
+            elif GameValue == BLEU: #2
+                hashage+="10"
+            elif GameValue == EMPTY: #0
+                hashage+="00"
+            else: #cas NDEF
+                hashage=hashage+"11"
+    return hashage
 
 #!test
 # grille, dico_conversion = init_grille_gopher(6)
 # dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
 # print(dico_legaux)
+
+
+def dehashing(hashage:str) -> list[list[GameValue]]:
+    """Fonction de dehashage d'une grille"""
+    gameValueGrid=[]
+    taille=int(hashage[0])
+    hashage=hashage[1:]
+    for i in range(taille*2+1):
+        gameValueGrid.append([])
+        for j in range(taille*2+1):
+            if hashage[0:2]=="01":
+                gameValueGrid[i].append(ROUGE)
+            elif hashage[0:2]=="10":
+                gameValueGrid[i].append(BLEU)
+            elif hashage[0:2]=="00":
+                gameValueGrid[i].append(EMPTY)
+            else:
+                gameValueGrid[i].append(NDEF)
+            hashage=hashage[2:]
+    return(gameValueGrid)
+
+#!test
+
+def state_generator(taille:int) -> Grid:
+    """Génère un état de jeu aléatoire"""
+    grille, dico_conversion = init_grille_gopher(taille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    actions_possible = list(dico_conversion.keys())
+    joueur = ROUGE
+    action_debut = rd.choice(actions_possible)
+    grille = play_action(grille, dico_conversion, action_debut, joueur)
+    dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action_debut)
+    joueur = ROUGE if joueur == BLEU else BLEU
+    while True:
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        if actions_legales == []:
+            break
+        action = rd.choice(actions_legales)
+        grille = play_action(grille, dico_conversion, action, joueur)
+        dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action)
+        joueur = ROUGE if joueur == BLEU else BLEU
+        if score_final(dico_legaux) != 0:
+            break
+    return grille
+
+def test_hashage_dehashage(taille:int):
+    """Teste la fonction de hashage et de déhashage"""
+    grille=state_generator(taille)
+    hashage=hashing(grille,taille)
+    grille2=dehashing(hashage)
+    print(hashage)
+    print(hex(int(hashage)))
+    print(grille)
+    print(grille2)
+    print(grille==grille2)
+        
+
+test_hashage_dehashage(6)
