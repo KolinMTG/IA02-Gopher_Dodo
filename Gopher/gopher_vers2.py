@@ -229,68 +229,68 @@ def hashing(gameValueGrid:Grid,taille: int) -> str:
     for Dimension in gameValueGrid:
         for GameValue in Dimension:
             if GameValue == ROUGE: #1
-                hashage+="01"
+                hashage+="1"
             elif GameValue == BLEU: #2
-                hashage+="10"
+                hashage+="2"
             elif GameValue == EMPTY: #0
-                hashage+="00"
+                hashage+="0"
             else: #cas NDEF
-                hashage=hashage+"11"
-    return hashage
+                hashage=hashage+"3"
+    return str(hex(int(hashage)))[2:]
 
 def dehashing(hashage:str) -> list[list[GameValue]]:
     """Fonction de dehashage d'une grille"""
+    hashage=str(int(hashage,16))
     gameValueGrid=[]
     taille=int(hashage[0])
     hashage=hashage[1:]
     for i in range(taille*2+1):
         gameValueGrid.append([])
         for j in range(taille*2+1):
-            if hashage[0:2]=="01":
+            if hashage[0]=="1":
                 gameValueGrid[i].append(ROUGE)
-            elif hashage[0:2]=="10":
+            elif hashage[0]=="2":
                 gameValueGrid[i].append(BLEU)
-            elif hashage[0:2]=="00":
+            elif hashage[0]=="0":
                 gameValueGrid[i].append(EMPTY)
             else:
                 gameValueGrid[i].append(NDEF)
-            hashage=hashage[2:]
+            hashage=hashage[1:]
     return(gameValueGrid)
 
 #!test
 
-# def state_generator(taille:int) -> Grid:
-#     """Génère un état de jeu aléatoire"""
-#     grille, dico_conversion = init_grille_gopher(taille)
-#     dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-#     actions_possible = list(dico_conversion.keys())
-#     joueur = ROUGE
-#     action_debut = rd.choice(actions_possible)
-#     grille = play_action(grille, dico_conversion, action_debut, joueur)
-#     dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action_debut)
-#     joueur = ROUGE if joueur == BLEU else BLEU
-#     while True:
-#         actions_legales = liste_coup_legaux(dico_legaux, joueur)
-#         if actions_legales == []:
-#             break
-#         action = rd.choice(actions_legales)
-#         grille = play_action(grille, dico_conversion, action, joueur)
-#         dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action)
-#         joueur = ROUGE if joueur == BLEU else BLEU
-#         if score_final(dico_legaux) != 0:
-#             break
-#     return grille
+def state_generator(taille:int) -> Grid:
+    """Génère un état de jeu aléatoire"""
+    grille, dico_conversion = init_grille_gopher(taille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    actions_possible = list(dico_conversion.keys())
+    joueur = ROUGE
+    action_debut = rd.choice(actions_possible)
+    grille = play_action(grille, dico_conversion, action_debut, joueur)
+    dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action_debut)
+    joueur = ROUGE if joueur == BLEU else BLEU
+    while True:
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        if actions_legales == []:
+            break
+        action = rd.choice(actions_legales)
+        grille = play_action(grille, dico_conversion, action, joueur)
+        dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action)
+        joueur = ROUGE if joueur == BLEU else BLEU
+        if score_final(dico_legaux) != 0:
+            break
+    return grille
 
-# def test_hashage_dehashage(taille:int):
-#     """Teste la fonction de hashage et de déhashage"""
-#     grille=state_generator(taille)
-#     hashage=hashing(grille,taille)
-#     grille2=dehashing(hashage)
-#     print(hashage)
-#     print(hex(int(hashage)))
-#     print(grille)
-#     print(grille2)
-#     print(grille==grille2)
+def test_hashage_dehashage(taille:int):
+    """Teste la fonction de hashage et de déhashage"""
+    grille=state_generator(taille)
+    hashage=hashing(grille,taille)
+    grille2=dehashing(hashage)
+    print(hashage)
+    print(grille)
+    print(grille2)
+    print(grille==grille2)
         
 
-# test_hashage_dehashage(6)
+test_hashage_dehashage(6)
