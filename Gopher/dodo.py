@@ -28,6 +28,7 @@ State = list[tuple[Cell, Player]] # État du jeu pour la boucle de jeu
 Score = int
 Time = int
 DirectionJeu = Dict #contient un vecteur direction qui selon lequel chaque joueur doit progresser pour gagner
+DicoLegaux = Dict[Dict]
 
 
 INF = +inf
@@ -118,18 +119,21 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!O
 # print(dico_conversion)
 
 
-def init_dico_legaux(dico_conversion:Dict) -> Tuple[Dict, Dict]: #!OK
+def init_dico_legaux(dico_conversion:Dict) -> DicoLegaux: #!OK
     """Initialise les dictionnaires des coup legaux des cases de jeu"""
+    tmp = {}
     dict_rouge = {}
-    dict_bleu = {}
-    for case in dico_conversion.keys():
-        dict_rouge[case] = False
-        dict_bleu[case] = False
-    return dict_rouge, dict_bleu
+    for case_depart, case_arrive in it.product(dico_conversion.keys(), dico_conversion.keys()):
+        dict_rouge[case_depart, case_arrive] = False
+    dict_bleu = copy.deepcopy(dict_rouge)
+    tmp[ROUGE] = dict_rouge
+    tmp[BLEU] = dict_bleu
+    return tmp
 
 # # #!test
-# # dict_legaux_rouge, dict_legaux_bleu = init_dico_legaux(init_grille(7)[1])
-
+dict_legaux_rouge, dict_legaux_bleu = init_dico_legaux(init_grille_dodo(7)[1])[ROUGE], init_dico_legaux(init_grille_dodo(7)[1])[BLEU]
+print(dict_legaux_rouge)
+print(dict_legaux_bleu)
 
 def existe(dico_conversion:Dict, pos:Cell) -> bool: #!OK
     """Renvoie True si la case existe et False sinon"""
@@ -169,21 +173,39 @@ def est_legal(grille : Grid, dico_conversion : Dict, direction: DirectionJeu, ac
     if grille[dico_conversion[cell_depart][0]][dico_conversion[cell_depart][1]] != joueur:
         print("La case de départ n'appartient pas au joueur")
         return False
+    
     #! verifier si la cell d'arrivee est vide
     if grille[dico_conversion[cell_arrivee][0]][dico_conversion[cell_arrivee][1]] != EMPTY:
         print("La case d'arrivée n'est pas vide")
         return False
     
-
     #! verifier si la cell de depart est adjacente à la cell d'arrivée et dans le bon sens :
-
     for dir_x, dir_y in direction[joueur]: 
         if cell_arrivee == (cell_depart[0]+dir_x, cell_depart[1]+dir_y): #on s'est déplacé dans une direction autorisée
             return True 
     return False
-    
 
-    
+
+def update_dico_legaux(grille : Grid, dico_conversion : Dict,  direction : DirectionJeu, dico_legaux : DicoLegaux, action:ActionDodo) -> Dict:
+    """Met à jour le dictionnaire des coups legaux pour tout les joueurs, etant donné une certaine action effectuée, on part du principe que l'action est légale"""
+    cell_depart, cell_arrivee = action
+    joueur_actif = grille[cell_depart[0]][cell_depart[1]] #le joueur qui est entrain de jouer est forcement celui qui a deplacé sa piece
+
+    liste_voisins = list(set(voisins(dico_conversion, cell_arrivee)) | set(voisins(dico_conversion, cell_depart))) #| est l'union de deux ensembles
+    #set permet de transformer une liste en ensemble, ce qui permet de faire des operations ensemblistes
+    for cell_depart in liste_voisins:
+        element_sur_cell = grille[dico_conversion[cell_depart][0]][dico_conversion[cell_depart][1]] #le joueur qui est sur la case
+        if element_sur_cell != EMPTY and element_sur_cell != NDEF:
+            cell_arrive_possible = [(cell_depart[0]+dir_x, cell_depart[1]+dir_y) for dir_x, dir_y in direction[element_sur_cell]]
+            for cell_arrive in cell_arrive_possible:
+                if est_legal(grille, dico_conversion, direction, (cell_depart, cell_arrive), element_sur_cell):
+                    dico_legaux[element_sur_cell][(cell_depart, cell_arrive)] = True #le coup est légal pour le joueur element_sur_cell
+                else :
+                    dico_legaux[element_sur_cell][(cell_depart, cell_arrive)] = False #le coup n'est pas légal pour le joueur element_sur_cell
+    return dico_legaux
+
+
+
 
 
 
