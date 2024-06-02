@@ -27,6 +27,7 @@ Player = int # 1 ou 2
 State = list[tuple[Cell, Player]] # État du jeu pour la boucle de jeu
 Score = int
 Time = int
+DirectionJeu = Dict #contient un vecteur direction qui selon lequel chaque joueur doit progresser pour gagner
 
 
 INF = +inf
@@ -81,7 +82,7 @@ def draw_hex_grid(data):
     plt.show()
 
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
-def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict]: #!OK
+def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!OK
     """Initialise la grille de jeu avec les pions au bon endroit. Et initialisation du dico de conversion."""
     taille_array = 2*taille_grille+1
     dico_conversion = {}
@@ -109,7 +110,7 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict]: #!OK
             grille[x_cell][y_cell] = ROUGE
         else:
             grille[x_cell][y_cell] = EMPTY #on remplit la grille avec les cases vides
-    return grille, dico_conversion
+    return grille, dico_conversion, {ROUGE: [(1,0),(0,1), (1,1)], BLEU: [(-1,0), (-1, -1), (0,-1)]}
 
 #!test
 # grille, dico_conversion = init_grille_dodo(7)
@@ -155,31 +156,38 @@ def voisins(dico_conversion : Dict, pos:Cell_hex) -> List[Cell_mat]:
 # print(voisins(init_grille_dodo(6)[1], (3, -3)))
 
 
-# def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : Player) -> bool:
-#     """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
-#     cell = dico_conversion[action]
-#     case_cible = grille[cell[0]][cell[1]]
-#     if not(existe(dico_conversion, action)): #si la case n'existe pas alors le coup n'est pas légal
-#         return False
-#     if case_cible[1] != EMPTY: #si la case n'est pas vide alors le coup n'est pas légal
-#         return False
+def est_legal(grille : Grid, dico_conversion : Dict, direction: DirectionJeu, action : ActionDodo, joueur : Player) -> bool:
+    """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
+    cell_depart, cell_arrivee = action
+
+    #!verifier que la cellule de depart et d'arrivee existent
+    if not existe(dico_conversion, cell_depart) or not existe(dico_conversion, cell_arrivee):
+        print("La cellule de départ ou d'arrivée n'existe pas")
+        return False
+
+    #! verifier si la cell de depart appartient au joueur
+    if grille[dico_conversion[cell_depart][0]][dico_conversion[cell_depart][1]] != joueur:
+        print("La case de départ n'appartient pas au joueur")
+        return False
+    #! verifier si la cell d'arrivee est vide
+    if grille[dico_conversion[cell_arrivee][0]][dico_conversion[cell_arrivee][1]] != EMPTY:
+        print("La case d'arrivée n'est pas vide")
+        return False
     
-#     nb_case_adverse = 0
+
+    #! verifier si la cell de depart est adjacente à la cell d'arrivée et dans le bon sens :
+
+    for dir_x, dir_y in direction[joueur]: 
+        if cell_arrivee == (cell_depart[0]+dir_x, cell_depart[1]+dir_y): #on s'est déplacé dans une direction autorisée
+            return True 
+    return False
     
-#     cases_voisins = voisins(grille, dico_conversion, action)
-#     for case in cases_voisins:
-#         if case[1] == joueur:
-#             return False
-#         elif case[1] != EMPTY: #si la case est adverse alors on incrémente le compteur
-#             nb_case_adverse += 1
-#             if nb_case_adverse >= 2:
-#                 return False
-#     return nb_case_adverse > 0
+
+    
 
 
 
-
-def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! A REVOIR 
+def rotation(grille : Grid, dico_conversion : Dict, direction: DirectionJeu) -> Tuple[List[Grid], List[DirectionJeu]]: #! OK
     """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
     taille_grille = len(grille)//2
     rot_1 = init_grille_dodo(taille_grille)[0]
@@ -217,32 +225,13 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! A REVOIR
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 # #!test
-for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
-    print("******************************ROT******************************")
-    print(rot)
-    draw_hex_grid(rot)
+# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
+#     print("******************************ROT******************************")
+#     print(rot)
+#     draw_hex_grid(rot)
 
 
-
-
-# def est_legal(grille : Grid, dico_conversion : Dict, action : ActionDodo, joueur : Player) -> bool:
-#     """Renvoie True si le coup est légal pour une grille donnée et False sinon"""
-#     cell_depart, cell_arrivee = action
-#     #! verifier si la cell de depart appartient au joueur
-#     if dico_conversion[cell_depart][1] != joueur:
-#         print("La case de départ n'appartient pas au joueur")
-#         return False
-#     #! verifier si la cell d'arrivee est vide
-#     if dico_conversion[cell_arrivee][1] != EMPTY:
-#         print("La case d'arrivée n'est pas vide")
-#         return False
-
-#     #! verifier si la cell d'arrivee est un voisin de la cell de depart au sens de dodo
-
-
-
-
-def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
+def reflexion(grille : Grid, dico_conversion : Dict, direction:DirectionJeu) -> Tuple[List[Grid], List[DirectionJeu]]: #! OK
     """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
     taille_grille = len(grille)//2 
     ref_1 = init_grille_dodo(taille_grille)[0]
@@ -279,7 +268,6 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
         ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
     return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
-
 
 #!test
 # for ref in reflexion(init_grille_dodo(7)[0], init_grille_dodo(7)[1]):
