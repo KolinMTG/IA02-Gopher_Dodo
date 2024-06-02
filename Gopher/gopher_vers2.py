@@ -224,7 +224,40 @@ print(boucle_rd_rd())
 
 
 
+### Fonctions de hashage et de déhashage ###
 
+def hashing(gameValueGrid:list[list[GameValue]]) -> str:
+    """Fonction de hashage d'une grille"""
+    hashage=""
+    for Dimension in gameValueGrid:
+        for GameValue in Dimension:
+            if GameValue == ROUGE: #1
+                hashage+="1"
+            elif GameValue == BLEU: #2
+                hashage+="2"
+            elif GameValue == EMPTY: #0
+                hashage+="0"
+            else: #cas NDEF
+                hashage+="3"
+    return (str(hex(int(hashage)))[2:])
+
+def dehashing(hashage:str,taille:int) -> list[list[GameValue]]:
+    """Fonction de dehashage d'une grille"""
+    gameValueGrid=[]
+    hashage=str(int(hashage,16))
+    for i in range(taille*2+1):
+        gameValueGrid.append([])
+        for j in range(taille*2+1):
+            if hashage[0]=="1":
+                gameValueGrid[i].append(ROUGE)
+            elif hashage[0]=="2":
+                gameValueGrid[i].append(BLEU)
+            elif hashage[0]=="0":
+                gameValueGrid[i].append(EMPTY)
+            else:
+                gameValueGrid[i].append(NDEF)
+            hashage=hashage[1:]
+    return(gameValueGrid)
 
 
 

@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from math import *
 import itertools as it
 import copy
-import affichage as aff
+# import affichage as aff
 # Types de base utilisés par l'arbitre
 Grid = NDArray# Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
