@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 from math import *
 import itertools as it
 import copy
+import affichage as aff
 # Types de base utilisés par l'arbitre
 Grid = NDArray# Grille de jeu (tableau 2D de cases), 
 #chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -37,50 +38,7 @@ ROUGE = 1
 BLEU = 2 
 NDEF = -1 # a utiliser pour les cases qui n'existes pas
 
-def transform_to_hexagonal_grid(data):
-    rows, cols = data.shape
-    new_data = np.full((rows, cols + rows // 2), -1)
 
-    for i in range(rows):
-        if i % 2 == 0:
-            new_data[i, i // 2: i // 2 + cols] = data[i]
-        else:
-            new_data[i, (i + 1) // 2: (i + 1) // 2 + cols] = data[i]
-    
-    return new_data
-
-def draw_hex_grid(data):
-    data = transform_to_hexagonal_grid(data)
-
-    # Constants for the hexagon geometry
-    hex_height = np.sqrt(3)
-    hex_width = 2
-    vert_dist = hex_height
-    horiz_dist = 1.5
-
-    fig, ax = plt.subplots(1)
-    ax.set_aspect('equal')
-
-    # Colors for different cell values
-    colors = {2: 'red', 1: 'blue', 0: 'white'}
-
-    # Draw the hexagons
-    for row in range(data.shape[0]):
-        for col in range(data.shape[1]):
-            value = data[row, col]
-            if value == -1:
-                continue
-            color = colors.get(value, 'white')
-            x = col * horiz_dist
-            y = row * vert_dist * 0.87  # Using 0.87 to adjust for the vertical spacing of hexagons
-            hexagon = patches.RegularPolygon((x, y), numVertices=6, radius=1, orientation=np.radians(30),
-                                             edgecolor='black', facecolor=color)
-            ax.add_patch(hexagon)
-
-    plt.xlim(-1, data.shape[1] * horiz_dist + 1)
-    plt.ylim(-1, data.shape[0] * vert_dist + 1)
-    plt.axis('off')
-    plt.show()
 
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
 def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!OK
@@ -250,7 +208,7 @@ def rotation(grille : Grid, dico_conversion : Dict, direction: DirectionJeu) -> 
 # for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
 #     print("******************************ROT******************************")
 #     print(rot)
-#     draw_hex_grid(rot)
+#     aff.draw_hex_grid(rot)
 
 
 def reflexion(grille : Grid, dico_conversion : Dict, direction:DirectionJeu) -> Tuple[List[Grid], List[DirectionJeu]]: #! OK
@@ -295,7 +253,7 @@ def reflexion(grille : Grid, dico_conversion : Dict, direction:DirectionJeu) -> 
 # for ref in reflexion(init_grille_dodo(7)[0], init_grille_dodo(7)[1]):
 #     print("******************************REF******************************")
 #     print(ref)
-#     draw_hex_grid(ref)
+#     aff.draw_hex_grid(ref)
 
 
 
