@@ -219,12 +219,24 @@ def boucle_rd_rd(): # ! boucle de jeu OK
     return score_final(dico_legaux)
 
 #!test
-print(boucle_rd_rd())
+#print(boucle_rd_rd())
 
 
 
 
 ### Fonctions de hashage et de déhashage ###
+
+
+def base62(nombre:int, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+    """Conversion en base62."""
+    base62 = ''
+    if 0 <= nombre < len(alphabet):
+        return alphabet[nombre]
+    while nombre != 0:
+        nombre, i = divmod(nombre, len(alphabet))
+        base62 = alphabet[i] + base62
+    return base62
+
 
 def hashing(gameValueGrid:list[list[GameValue]]) -> str:
     """Fonction de hashage d'une grille"""
@@ -238,30 +250,14 @@ def hashing(gameValueGrid:list[list[GameValue]]) -> str:
             elif GameValue == EMPTY: #0
                 hashage+="0"
             else: #cas NDEF
-                hashage+="3"
-    return (str(hex(int(hashage)))[2:])
-
-def dehashing(hashage:str,taille:int) -> list[list[GameValue]]:
-    """Fonction de dehashage d'une grille"""
-    gameValueGrid=[]
-    hashage=str(int(hashage,16))
-    for i in range(taille*2+1):
-        gameValueGrid.append([])
-        for j in range(taille*2+1):
-            if hashage[0]=="1":
-                gameValueGrid[i].append(ROUGE)
-            elif hashage[0]=="2":
-                gameValueGrid[i].append(BLEU)
-            elif hashage[0]=="0":
-                gameValueGrid[i].append(EMPTY)
-            else:
-                gameValueGrid[i].append(NDEF)
-            hashage=hashage[1:]
-    return(gameValueGrid)
-
-
-
+                continue
+    print(len(hashage))
+    print(len(str(hex(int(hashage)))[2:]))
+    print(len(str(base62(int(hashage)))))
     
+    return (str(base62(int(hashage))))
+
+
 
 #!test
 
@@ -287,17 +283,10 @@ def state_generator(taille:int) -> Grid:
             break
     return grille
 
-def test_hashage_dehashage(taille:int) -> bool:
-    """Teste la fonction de hashage et de déhashage"""
+def test_hashage(taille:int):
+    """Teste la fonction de hashage"""
     grille=state_generator(taille)
     hashage=hashing(grille)
-    grille2=dehashing(hashage,taille)
     print(hashage)
-    bool_test=(grille==grille2)
-    for elt in bool_test:
-        for booleen in elt:
-            if not(booleen):
-                return False
-    return True
- 
-print(test_hashage_dehashage(15))
+
+test_hashage(20)
