@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from typing import Union, List, Tuple, Dict
 import pprint
 import tkinter as tk
@@ -33,13 +35,57 @@ ROUGE = 1
 BLEU = 2 
 NDEF = -1 # a utiliser pour les cases qui n'existes pas
 
+def transform_to_hexagonal_grid(data):
+    rows, cols = data.shape
+    new_data = np.full((rows, cols + rows // 2), -1)
+
+    for i in range(rows):
+        if i % 2 == 0:
+            new_data[i, i // 2: i // 2 + cols] = data[i]
+        else:
+            new_data[i, (i + 1) // 2: (i + 1) // 2 + cols] = data[i]
+    
+    return new_data
+
+def draw_hex_grid(data):
+    data = transform_to_hexagonal_grid(data)
+
+    # Constants for the hexagon geometry
+    hex_height = np.sqrt(3)
+    hex_width = 2
+    vert_dist = hex_height
+    horiz_dist = 1.5
+
+    fig, ax = plt.subplots(1)
+    ax.set_aspect('equal')
+
+    # Colors for different cell values
+    colors = {2: 'red', 1: 'blue', 0: 'white'}
+
+    # Draw the hexagons
+    for row in range(data.shape[0]):
+        for col in range(data.shape[1]):
+            value = data[row, col]
+            if value == -1:
+                continue
+            color = colors.get(value, 'white')
+            x = col * horiz_dist
+            y = row * vert_dist * 0.87  # Using 0.87 to adjust for the vertical spacing of hexagons
+            hexagon = patches.RegularPolygon((x, y), numVertices=6, radius=1, orientation=np.radians(30),
+                                             edgecolor='black', facecolor=color)
+            ax.add_patch(hexagon)
+
+    plt.xlim(-1, data.shape[1] * horiz_dist + 1)
+    plt.ylim(-1, data.shape[0] * vert_dist + 1)
+    plt.axis('off')
+    plt.show()
 
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
 def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict]: #!OK
     """Initialise la grille de jeu avec les pions au bon endroit. Et initialisation du dico de conversion."""
     taille_array = 2*taille_grille+1
     dico_conversion = {}
-    grille = np.full((taille_array, taille_array), EMPTY)
+    grille = np.full((taille_array, taille_array), NDEF)
 
     #! initialisation du dico de conversion pour les coordonnées des cases de jeu
     compteur = taille_grille
@@ -89,8 +135,8 @@ def existe(dico_conversion:Dict, pos:Cell) -> bool: #!OK
     return pos in dico_conversion.keys()
 
 # # #!test
-# # print(existe(init_grille(6)[1], (0, 0))) #normalement True
-# # print(existe(init_grille(6)[1], (7, 0))) #normalement False
+# print(existe(init_grille_dodo(6)[1], (0, 0))) #normalement True
+# print(existe(init_grille_dodo(6)[1], (7, 0))) #normalement False
 
 
 def voisins(dico_conversion : Dict, pos:Cell_hex) -> List[Cell_mat]:
@@ -104,9 +150,9 @@ def voisins(dico_conversion : Dict, pos:Cell_hex) -> List[Cell_mat]:
     return liste_voisins 
 
 # #!test
-# # print(voisins(init_grille(7), (6,6)))
-# # print(voisins(init_grille(7), (0,0)))
-# # print(voisins(init_grille(7), (3, -3)))
+# print(voisins(init_grille_dodo(6)[1], (6,6)))
+# print(voisins(init_grille_dodo(6)[1], (0,0)))
+# print(voisins(init_grille_dodo(6)[1], (3, -3)))
 
 
 # def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : Player) -> bool:
@@ -133,42 +179,43 @@ def voisins(dico_conversion : Dict, pos:Cell_hex) -> List[Cell_mat]:
 
 
 
-def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #!OK
+def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! A REVOIR 
     """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
-    taille_grille = len(grille)//2 
+    taille_grille = len(grille)//2
     rot_1 = init_grille_dodo(taille_grille)[0]
     rot_2 = copy.deepcopy(rot_1)
     rot_3 = copy.deepcopy(rot_1)
     rot_4 = copy.deepcopy(rot_1)
     rot_5 = copy.deepcopy(rot_1)
 
-    for x_hex, y_hex in dico_conversion.key(): #enumeration de tout les element de la matrice
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        print("x_hex, y_hex", cell)
         #!rotation 60°
-            new_cell = (y_hex, y_hex-x_hex)
-            rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+        draw_hex_grid(rot_1)
         #!rotation 120°
-            rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_1[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-
-        #! rotation 180°
-            rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_2[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-
-        #! rotation 240°
-            rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_3[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-
-        #! rotation 300°
-            rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = rot_4[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
-
+        rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_1[dico_conversion[cell][0]][dico_conversion[cell][1]]
+        draw_hex_grid(rot_2)
+        #!rotation 180°
+        rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_2[dico_conversion[cell][0]][dico_conversion[cell][1]]
+        draw_hex_grid(rot_3)
+        #!rotation 240°
+        rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_3[dico_conversion[cell][0]][dico_conversion[cell][1]]
+        draw_hex_grid(rot_4)
+        #!rotation 300°
+        rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
+        draw_hex_grid(rot_5)
+    
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 # #!test
-# # for rot in rotation(init_grille(7)[0], init_grille(7)[1]):
-# #     print("******************************ROT******************************")
-# #     print(rot)
+# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
+#     print("******************************ROT******************************")
+#     print(rot)
 
-# def init_pions_dodo(grille : Grid, dico_conversion : Dict) -> Tuple[Grid, Dict]:
-#     """Initialise les pions dodo sur la grille, les rouges d'un coté les bleus de l'autre"""
-
+# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
+#     draw_hex_grid(rot)
 
 
 
@@ -199,39 +246,40 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
     ref_5 = copy.deepcopy(ref_1)
     ref_6 = copy.deepcopy(ref_1)
 
-    for x_hex, y_hex in dico_conversion.keys(): #enumeration de tout les element de la matrice
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
 
         #! symetrie axiale verticale
-        new_cell = (y_hex, x_hex)
-        ref_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (cell[1], cell[0])
+        ref_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
     
         #! symetrie axiale horizontale
-        new_cell = (-y_hex, -x_hex)
-        ref_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (-cell[1], -cell[0])
+        ref_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
         #! symetrie axe bleu
-        new_cell = (-x_hex, y_hex-x_hex)
-        ref_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (-cell[0], cell[1]-cell[0])
+        ref_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
         #! symetrie axe rouge
-        new_cell = (x_hex - y_hex, -y_hex)
-        ref_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (cell[0] - cell[1], -cell[1])
+        ref_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
          #! autre axe 
-        new_cell = (x_hex, x_hex-y_hex)
-        ref_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (cell[0], cell[0]-cell[1])
+        ref_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
     
         #! autre axe 
-        new_cell = (y_hex - x_hex, y_hex)
-        ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]][1] = grille[dico_conversion[x_hex][0]][dico_conversion[x_hex][1]][1]
+        new_cell = (cell[1] - cell[0], cell[1])
+        ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
     return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
 
 
 #!test
-# for ref in reflexion(init_grille(7)[0], init_grille(7)[1]):
-#     print("******************************REF******************************")
-#     print(ref)
+for ref in reflexion(init_grille_dodo(7)[0], init_grille_dodo(7)[1]):
+    print("******************************REF******************************")
+    print(ref)
+    draw_hex_grid(ref)
 
 
 
