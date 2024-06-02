@@ -187,35 +187,41 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! A REVOIR
     rot_3 = copy.deepcopy(rot_1)
     rot_4 = copy.deepcopy(rot_1)
     rot_5 = copy.deepcopy(rot_1)
+    
 
+    #!rotation 60°
     for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
-        print("x_hex, y_hex", cell)
-        #!rotation 60°
         new_cell = (cell[1], cell[1]-cell[0])
         rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
-        draw_hex_grid(rot_1)
-        #!rotation 120°
+
+    #!rotation 120°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
         rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_1[dico_conversion[cell][0]][dico_conversion[cell][1]]
-        draw_hex_grid(rot_2)
-        #!rotation 180°
+
+    #!rotation 180°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
         rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_2[dico_conversion[cell][0]][dico_conversion[cell][1]]
-        draw_hex_grid(rot_3)
-        #!rotation 240°
-        rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_3[dico_conversion[cell][0]][dico_conversion[cell][1]]
-        draw_hex_grid(rot_4)
-        #!rotation 300°
-        rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
-        draw_hex_grid(rot_5)
     
+    #!rotation 240°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_3[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+    #!rotation 300°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 # #!test
-# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
-#     print("******************************ROT******************************")
-#     print(rot)
+for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
+    print("******************************ROT******************************")
+    print(rot)
+    draw_hex_grid(rot)
 
-# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
-#     draw_hex_grid(rot)
 
 
 
@@ -276,10 +282,10 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]:
 
 
 #!test
-for ref in reflexion(init_grille_dodo(7)[0], init_grille_dodo(7)[1]):
-    print("******************************REF******************************")
-    print(ref)
-    draw_hex_grid(ref)
+# for ref in reflexion(init_grille_dodo(7)[0], init_grille_dodo(7)[1]):
+#     print("******************************REF******************************")
+#     print(ref)
+#     draw_hex_grid(ref)
 
 
 
