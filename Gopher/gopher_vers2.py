@@ -226,7 +226,7 @@ print(boucle_rd_rd())
 
 ### Fonctions de hashage et de déhashage ###
 
-def hashing(gameValueGrid:list[list[GameValue]]) -> str:
+def hashing(gameValueGrid:Grid) -> str:
     """Fonction de hashage d'une grille"""
     hashage=""
     for Dimension in gameValueGrid:
@@ -301,3 +301,7 @@ def test_hashage_dehashage(taille:int) -> bool:
     return True
  
 print(test_hashage_dehashage(15))
+
+
+
+print(len("e21c48d847acb65ad1dde0a9acb97f27b6c14cff79c878c2eba8daeabd1ddf49cc037afbe3dc41856c908ff3c4165c012216d6d08036023a54230389c058d110b410e7003615"))
