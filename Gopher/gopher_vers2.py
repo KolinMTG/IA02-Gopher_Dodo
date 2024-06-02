@@ -1,5 +1,3 @@
-
-
 #! ---------------------- IMPORTS ---------------------- !#
 import numpy as np
 from typing import Union, List, Tuple, Dict
@@ -217,22 +215,56 @@ def boucle_rd_rd(): # ! boucle de jeu OK
 
         if score_final(dico_legaux) != 0:
             break
-    aff.draw_hex_grid(grille)
+    #aff.draw_hex_grid(grille)
     return score_final(dico_legaux)
 
 #!test
-# print(boucle_rd_rd())
+print(boucle_rd_rd())
 
 
 
 
-print(init_grille_gopher(6)[0])
+
 
 
 
     
 
 #!test
-# grille, dico_conversion = init_grille_gopher(6)
-# dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-# print(dico_legaux)
+
+def state_generator(taille:int) -> Grid:
+    """Génère un état de jeu aléatoire"""
+    grille, dico_conversion = init_grille_gopher(taille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    actions_possible = list(dico_conversion.keys())
+    joueur = ROUGE
+    action_debut = rd.choice(actions_possible)
+    grille = play_action(grille, dico_conversion, action_debut, joueur)
+    dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action_debut)
+    joueur = ROUGE if joueur == BLEU else BLEU
+    while True:
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        if actions_legales == []:
+            break
+        action = rd.choice(actions_legales)
+        grille = play_action(grille, dico_conversion, action, joueur)
+        dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action)
+        joueur = ROUGE if joueur == BLEU else BLEU
+        if score_final(dico_legaux) != 0:
+            break
+    return grille
+
+def test_hashage_dehashage(taille:int) -> bool:
+    """Teste la fonction de hashage et de déhashage"""
+    grille=state_generator(taille)
+    hashage=hashing(grille)
+    grille2=dehashing(hashage,taille)
+    print(hashage)
+    bool_test=(grille==grille2)
+    for elt in bool_test:
+        for booleen in elt:
+            if not(booleen):
+                return False
+    return True
+ 
+print(test_hashage_dehashage(15))
