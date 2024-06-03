@@ -71,7 +71,7 @@ def init_grille_gopher(taille_grille: int) -> Tuple[Grid, Dict]: #!OK
     return grille, dico_conversion
 
 #!test
-# grille, dico_conversion = init_grille_gopher(6)
+# grille, dico_conversion = init_grille_gopher(10)
 # aff.afficher_hex(grille, dico_conversion)
 # print(grille)
 # print(dico_conversion)
@@ -178,7 +178,10 @@ def update_dico_legaux(dico_legaux:DictLegauxGopher, grille:Grid, dico_conversio
                 dico_legaux[joueur][cell] = False
     return dico_legaux
 
-        
+
+def final(player : Player, dico_legaux: DictLegauxGopher) -> bool: #!OK
+    """Renvoie True si le joueur a gagné et False sinon"""
+    return liste_coup_legaux(dico_legaux, player) == []
 
 
 def score_final(dico_legaux: DictLegauxGopher) -> int: #!OK
@@ -212,16 +215,19 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
         # print("Action : ", action)
         grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
         joueur = ROUGE if joueur == BLEU else BLEU #changement de joueur
-        if score_final(dico_legaux) != 0:
+        
+        if final(joueur, dico_legaux):
             break
-    #aff.draw_hex_grid(grille)
+    aff.afficher_hex(grille, dico_conversion= dico_conversion)
     return score_final(dico_legaux)
 
 #!test
 # boucle = 0
-# for _ in tqdm(range(10000)):
+# for i in tqdm(range(100)):
 #     boucle += boucle_rd_rd(6)
-# print(boucle) #normalement autours de 0
+# print(boucle)
+
+# print(boucle_rd_rd(6)) #normalement 1 ou -1
 
 
 
@@ -406,13 +412,13 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
 def memoize(fonction):
     """Memoize decorator pour la fonction alpha_beta"""
     cache = {} # closure
-    def g(grille: Grid,dico_conversion:DictConv, player: Player):
+    def g(grille : Grid,dico_conversion : DictConv, player : Player, dico_legaux : DictLegauxGopher, depth, alpha, beta):
         grille_hashed = hashing(grille)
         if grille_hashed in cache: 
             # print("Appel memoize")
             return cache[grille_hashed]
 
-        val = fonction(grille, player) #! c'est bien grille et non grille_hashed
+        val = fonction(grille,dico_conversion, player, dico_legaux, depth, alpha, beta) #! c'est bien grille et non grille_hashed
         cache[grille_hashed] = val
         ref = reflexion(grille, dico_conversion)
         for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
@@ -470,3 +476,34 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
         return min_value, best_action
 
 
+
+
+
+def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
+    """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
+
+    grille, dico_conversion = init_grille_gopher(taille_grille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    actions_possible = list(dico_conversion.keys())
+    joueur = ROUGE
+    action_debut = rd.choice(actions_possible)
+    grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
+
+    joueur = ROUGE if joueur == BLEU else BLEU
+    while True:
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        if joueur == ROUGE:
+            action = rd.choice(actions_legales)
+        else:  # joueur == BLEU
+            _, action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -float('inf'), float('inf'))
+
+        grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
+        joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
+        
+        if final(joueur, dico_legaux):
+            break
+    
+    aff.afficher_hex(grille, dico_conversion=dico_conversion)
+    return score_final(dico_legaux)
+
+boucle_rd_alpha_beta(6, 3)
