@@ -388,7 +388,7 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
 #TODO : -memoization avec hashage
 #TODO : -gestion des symetries, reflexions et rotations avec hashage
 #TODO : -une certaines profondeur de recherche
-#TODO : -un tri des noeuds en fonction des coupures alpha et beta
+# TODO : -un tri des noeuds en fonction des coupures alpha et beta
 #TODO ; multiprocess
 
 
