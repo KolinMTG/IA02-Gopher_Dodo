@@ -11,6 +11,8 @@ from tqdm import tqdm
 
 import matplotlib.pyplot as plt
 
+import affichage as aff
+
 
 #! ---------------------- CONSTANTES ---------------------- !#
 INF = +inf
@@ -70,6 +72,7 @@ def init_grille_gopher(taille_grille: int) -> Tuple[Grid, Dict]: #!OK
 
 #!test
 # grille, dico_conversion = init_grille_gopher(6)
+# aff.afficher_hex(grille, dico_conversion)
 # print(grille)
 # print(dico_conversion)
 
@@ -278,17 +281,17 @@ def state_generator(taille:int) -> Grid:
             break
     return grille
 
-def test_hashage(taille:int):
-    """Teste la fonction de hashage"""
-    grille=state_generator(taille)
-    hashage=hashing(grille)
-    print(hashage)
-    bool_test=(grille==grille2)
-    for elt in bool_test:
-        for booleen in elt:
-            if not(booleen):
-                return False
-    return True
+# def test_hashage(taille:int):
+#     """Teste la fonction de hashage"""
+#     grille=state_generator(taille)
+#     hashage=hashing(grille)
+#     print(hashage)
+#     bool_test=(grille==grille2)
+#     for elt in bool_test:
+#         for booleen in elt:
+#             if not(booleen):
+#                 return False
+#     return True
 
 # !test
 # print(test_hashage_dehashage(15))
@@ -384,11 +387,11 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
 #!---------------------- Alpha Beta ----------------------!#
 
 #cette section contient les fonctions nécessaires pour l'implémentation de l'algorithme alpha beta
-#TODO : implementer un alpha-beta, utilisant : 
-#TODO : -memoization avec hashage
-#TODO : -gestion des symetries, reflexions et rotations avec hashage
-#TODO : -une certaines profondeur de recherche
-# TODO : -un tri des noeuds en fonction des coupures alpha et beta
+#// TODO : implementer un alpha-beta, utilisant : 
+#// TODO : -memoization avec hashage
+#// TODO : -gestion des symetries, reflexions et rotations avec hashage
+#// TODO : -une certaines profondeur de recherche
+#// TODO : -un tri des noeuds en fonction des coupures alpha et beta
 #TODO ; multiprocess
 
 
@@ -465,3 +468,5 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
             if beta <= alpha:
                 break  # Coupe alpha
         return min_value, best_action
+
+
