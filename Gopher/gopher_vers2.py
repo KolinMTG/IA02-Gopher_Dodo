@@ -81,6 +81,7 @@ def existe(dico_conversion:Dict, pos:CellHex) -> bool: #!OK
 
 #!test
 # grille, dico_conversion = init_grille_gopher(6)
+# print(grille, dico_conversion)
 # print(existe(dico_conversion, (0,0))) #normalement True
 # print(existe(dico_conversion, (0,7))) #normalement False
 
@@ -224,15 +225,15 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
 ### Fonctions de hashage et de déhashage ###
 
 
-def base62(nombre:int, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
-    """Conversion en base62."""
-    base62 = ''
+def base64(nombre:int, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,'):
+    """Conversion en base64."""
+    base64 = ''
     if 0 <= nombre < len(alphabet):
         return alphabet[nombre]
     while nombre != 0:
         nombre, i = divmod(nombre, len(alphabet))
-        base62 = alphabet[i] + base62
-    return base62
+        base64 = alphabet[i] + base64
+    return base64
 
 
 def hashing(gameValueGrid:list[list[GameValue]]) -> str:
@@ -250,9 +251,8 @@ def hashing(gameValueGrid:list[list[GameValue]]) -> str:
                 continue
     print(len(hashage))
     print(len(str(hex(int(hashage)))[2:]))
-    print(len(str(base62(int(hashage)))))
-    
-    return (str(base62(int(hashage))))
+    print(len(str(base64(int(hashage)))))
+    return (str(base64(int(hashage))))
 
 #! ---------------------- Hashage et dehashage ---------------------- !#
 
