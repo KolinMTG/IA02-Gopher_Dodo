@@ -258,9 +258,9 @@ def hashing(gameValueGrid:list[list[GameValue]]) -> str:
                 hashage+="0"
             else: #cas NDEF
                 continue
-    print(len(hashage))
-    print(len(str(hex(int(hashage)))[2:]))
-    print(len(str(base64(int(hashage)))))
+    # print(len(hashage))
+    # print(len(str(hex(int(hashage)))[2:]))
+    # print(len(str(base64(int(hashage)))))
     return (str(base64(int(hashage))))
 
 #! ---------------------- Hashage et dehashage ---------------------- !#
@@ -452,7 +452,7 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
     if player_max == ROUGE:
         best_value = -INF
         best_action = None
-        for action in trier_actions(liste_coup_legaux(dico_legaux, ROUGE), player_max):
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):
             new_element = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             new_value, _ = alpha_beta(new_element[0],dico_conversion, BLEU, new_element[1], depth - 1, alpha, beta)
             if new_value > best_value:
@@ -465,7 +465,8 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
     else:
         min_value = INF
         best_action = None
-        for action in trier_actions(liste_coup_legaux(dico_legaux, BLEU), player_max):
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max):
+            new_element = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
             new_value, _ = alpha_beta(new_element[0],dico_conversion, ROUGE, new_element[1], depth - 1, alpha, beta)
             if new_value < min_value:
                 min_value = new_value
@@ -475,7 +476,27 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
                 break  # Coupe alpha
         return min_value, best_action
 
+def alpha_beta_bestcoup(grille : Grid,dico_conversion : DictConv, player : Player, dico_legaux : DictLegauxGopher, depth) -> Action:
+    grid = copy.deepcopy(grille)
 
+    best_value_max = -INF
+    best_value_min = INF
+    best_action = None
+    alpha = -INF
+    beta = INF
+    for action in liste_coup_legaux(dico_legaux, player):
+        grid_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
+        if player == ROUGE:
+            value, _ = alpha_beta(grid_suiv, BLEU, depth-1, alpha, beta)
+            if value > best_value_max:
+                best_value_max = value
+                best_action = action
+        elif player == BLEU:
+            value, _ = alpha_beta(grille, dico_conversion, ROUGE, dico_legaux, depth-1, alpha, beta)
+            if value < best_value_min:
+                best_value_min = value
+                best_action = action
+    return best_action
 
 
 
@@ -491,11 +512,12 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 
     joueur = ROUGE if joueur == BLEU else BLEU
     while True:
-        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        
         if joueur == ROUGE:
+            actions_legales = liste_coup_legaux(dico_legaux, joueur)
             action = rd.choice(actions_legales)
         else:  # joueur == BLEU
-            _, action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -float('inf'), float('inf'))
+            action = alpha_beta_bestcoup(grille, dico_conversion, joueur, dico_legaux, depth)
 
         grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
         joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
@@ -506,4 +528,4 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
     aff.afficher_hex(grille, dico_conversion=dico_conversion)
     return score_final(dico_legaux)
 
-boucle_rd_alpha_beta(6, 3)
+boucle_rd_alpha_beta(6, 6)
