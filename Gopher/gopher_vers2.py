@@ -439,8 +439,10 @@ def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_l
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             liste_values.append(score_final(dico_legaux))
-    return [x for y, x in sorted(zip(liste_values, liste_actions), key=lambda y:y[0])]
+    print([x for _, x in sorted(zip(liste_values, liste_actions))])
+    return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
+#, key=lambda y:y[0]
 
 
 
@@ -452,7 +454,7 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
     if player_max == ROUGE:
         best_value = -INF
         best_action = None
-        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):#! pas d'erreur dans trier_actions
             new_element = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             new_value, _ = alpha_beta(new_element[0],dico_conversion, BLEU, new_element[1], depth - 1, alpha, beta)
             if new_value > best_value:
@@ -462,10 +464,10 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
             if beta <= alpha:
                 break  # Coupe bêta
         return best_value, best_action
-    else:
+    else: #! problème quelquepart dans bleu
         min_value = INF
         best_action = None
-        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max):
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max): #! pas d'erreur dans trier_actions
             new_element = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
             new_value, _ = alpha_beta(new_element[0],dico_conversion, ROUGE, new_element[1], depth - 1, alpha, beta)
             if new_value < min_value:
@@ -478,25 +480,25 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
 
 def alpha_beta_bestcoup(grille : Grid,dico_conversion : DictConv, player : Player, dico_legaux : DictLegauxGopher, depth) -> Action:
     grid = copy.deepcopy(grille)
-
     best_value_max = -INF
     best_value_min = INF
     best_action = None
     alpha = -INF
     beta = INF
     for action in liste_coup_legaux(dico_legaux, player):
-        grid_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
+        grid_suiv, dico_legaux_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
         if player == ROUGE:
-            value, _ = alpha_beta(grid_suiv, BLEU, depth-1, alpha, beta)
+            value, _ = alpha_beta(grid_suiv, dico_conversion,BLEU,dico_legaux_suiv, depth, alpha, beta)
             if value > best_value_max:
                 best_value_max = value
                 best_action = action
         elif player == BLEU:
-            value, _ = alpha_beta(grille, dico_conversion, ROUGE, dico_legaux, depth-1, alpha, beta)
+            value, _ = alpha_beta(grid_suiv, dico_conversion, ROUGE, dico_legaux_suiv, depth, alpha, beta)
             if value < best_value_min:
                 best_value_min = value
                 best_action = action
     return best_action
+
 
 
 
@@ -512,20 +514,28 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 
     joueur = ROUGE if joueur == BLEU else BLEU
     while True:
-        
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
         if joueur == ROUGE:
-            actions_legales = liste_coup_legaux(dico_legaux, joueur)
-            action = rd.choice(actions_legales)
-        else:  # joueur == BLEU
             action = alpha_beta_bestcoup(grille, dico_conversion, joueur, dico_legaux, depth)
 
+            
+        else:  # joueur == BLEU
+            action = rd.choice(actions_legales)
+            
         grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
         joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
         
         if final(joueur, dico_legaux):
             break
     
-    aff.afficher_hex(grille, dico_conversion=dico_conversion)
+        # aff.afficher_hex(grille, dico_conversion=dico_conversion)
     return score_final(dico_legaux)
 
-boucle_rd_alpha_beta(6, 6)
+
+# boucle = 0
+# for i in tqdm(range(100)):
+#     boucle += boucle_rd_alpha_beta(6, 3)
+# # boucle_rd_alpha_beta(6, 6)
+# print(boucle)
+
+print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
