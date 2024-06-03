@@ -7,6 +7,8 @@ import multiprocessing as mp
 from math import *
 import itertools as it
 import copy
+from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 
 
@@ -106,11 +108,12 @@ def init_dico_legaux_gopher(grille:Grid, dico_conversion:DictConv) -> DictLegaux
             dico_legaux[joueur][action] = False
     return dico_legaux
 
-def play_action(grille:Grid, dico_conversion:DictConv, action:ActionGopher, joueur:Player) -> Grid: #
+def play_action(grille:Grid, dico_conversion:DictConv, action:ActionGopher, joueur:Player, dict_legaux : DictLegauxGopher) -> Tuple[Grid, DictLegauxGopher]: 
     """Joue un coup pour un joueur donné, /!\ verifier que l'action est légale, l'action est de type Cell_hex"""
     cell_mat = dico_conversion[action]
     grille[cell_mat[0]][cell_mat[1]] = joueur
-    return grille
+    dict_legaux = update_dico_legaux(dict_legaux, grille, dico_conversion, action)
+    return grille, dict_legaux
 
 #!test
 # grille, dico_conversion = init_grille_gopher(6)
@@ -130,8 +133,8 @@ def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : 
         # print("case non vide")
         return False
     nb_voisin = 0
-    print(action)
-    print("voisins : ", voisins(dico_conversion, action))
+    # print(action)
+    # print("voisins : ", voisins(dico_conversion, action))
     for cell_voisin in voisins(dico_conversion, action): #on regarde les cases voisines
         if grille[dico_conversion[cell_voisin][0]][dico_conversion[cell_voisin][1]] == joueur:
             # print("deja une case du joueur sur une case voisine")
@@ -172,7 +175,7 @@ def update_dico_legaux(dico_legaux:DictLegauxGopher, grille:Grid, dico_conversio
                 dico_legaux[joueur][cell] = False
     return dico_legaux
 
-
+        
 
 
 def score_final(dico_legaux: DictLegauxGopher) -> int: #!OK
@@ -183,44 +186,39 @@ def score_final(dico_legaux: DictLegauxGopher) -> int: #!OK
 
 
 
-def boucle_rd_rd(): # ! boucle de jeu OK
+def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
     """Boucle de jeu pour deux joueurs aléatoires"""
 
-    grille, dico_conversion = init_grille_gopher(6)
+    grille, dico_conversion = init_grille_gopher(taille_grille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
     actions_possible = list(dico_conversion.keys())
     joueur = ROUGE
     action_debut = rd.choice(actions_possible)
-    print("Joueur de debut : ", joueur)
-    print("Action de debut : ", action_debut)
-    grille = play_action(grille, dico_conversion, action_debut, joueur)
-    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    # print("Joueur de debut : ", joueur)
+    # print("Action de debut : ", action_debut)
+    grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
+
     # print("DicoLegaux: ", dico_legaux)
-    dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action_debut)
     # print("DicoLegaux UPDATE : ", dico_legaux)
     joueur = ROUGE if joueur == BLEU else BLEU
     while True:
-        print("Joueur : ", joueur)
+        # print("Joueur : ", joueur)
         actions_legales = liste_coup_legaux(dico_legaux, joueur)
-        print("Liste coup legaux : ", liste_coup_legaux(dico_legaux, joueur))
-        if actions_legales == []:
-            break
+        # print("Liste coup legaux : ", liste_coup_legaux(dico_legaux, joueur))
         action = rd.choice(actions_legales)
-        print("Action : ", action)
-        grille = play_action(grille, dico_conversion, action, joueur)
-        dico_legaux = update_dico_legaux(dico_legaux, grille, dico_conversion, action)
-        
-        
-        
-        joueur = ROUGE if joueur == BLEU else BLEU
-
+        # print("Action : ", action)
+        grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
+        joueur = ROUGE if joueur == BLEU else BLEU #changement de joueur
         if score_final(dico_legaux) != 0:
             break
     #aff.draw_hex_grid(grille)
     return score_final(dico_legaux)
 
 #!test
-#print(boucle_rd_rd())
-
+# boucle = 0
+# for _ in tqdm(range(10000)):
+#     boucle += boucle_rd_rd(6)
+# print(boucle) #normalement autours de 0
 
 
 
@@ -256,9 +254,7 @@ def hashing(gameValueGrid:list[list[GameValue]]) -> str:
     print(len(str(base64(int(hashage)))))
     return (str(base64(int(hashage))))
 
-
-
-#!test
+#! ---------------------- Hashage et dehashage ---------------------- !#
 
 def state_generator(taille:int) -> Grid:
     """Génère un état de jeu aléatoire"""
@@ -287,5 +283,185 @@ def test_hashage(taille:int):
     grille=state_generator(taille)
     hashage=hashing(grille)
     print(hashage)
+    bool_test=(grille==grille2)
+    for elt in bool_test:
+        for booleen in elt:
+            if not(booleen):
+                return False
+    return True
 
-test_hashage(20)
+# !test
+# print(test_hashage_dehashage(15))
+#print(len("e21c48d847acb65ad1dde0a9acb97f27b6c14cff79c878c2eba8daeabd1ddf49cc037afbe3dc41856c908ff3c4165c012216d6d08036023a54230389c058d110b410e7003615"))
+
+
+
+#! ---------------------- Reflexions et rotations ---------------------- !#
+
+def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
+    """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
+    taille_grille = len(grille)//2
+    rot_1 = init_grille_gopher(taille_grille)[0]
+    rot_2 = copy.deepcopy(rot_1)
+    rot_3 = copy.deepcopy(rot_1)
+    rot_4 = copy.deepcopy(rot_1)
+    rot_5 = copy.deepcopy(rot_1)
+    
+
+    #!rotation 60°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    #!rotation 120°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_1[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    #!rotation 180°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_2[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+    #!rotation 240°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_3[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+    #!rotation 300°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
+    
+# #!test
+# for rot in rotation(init_grille_dodo(6)[0], init_grille_dodo(6)[1]):
+#     print("******************************ROT******************************")
+#     print(rot)
+#     aff.draw_hex_grid(rot)
+
+
+def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
+    """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
+    taille_grille = len(grille)//2 
+    ref_1 = init_grille_gopher(taille_grille)[0]
+    ref_2 = copy.deepcopy(ref_1)
+    ref_3 = copy.deepcopy(ref_1)
+    ref_4 = copy.deepcopy(ref_1)
+    ref_5 = copy.deepcopy(ref_1)
+    ref_6 = copy.deepcopy(ref_1)
+
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+
+        #! symetrie axiale verticale
+        new_cell = (cell[1], cell[0])
+        ref_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+        #! symetrie axiale horizontale
+        new_cell = (-cell[1], -cell[0])
+        ref_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+        #! symetrie axe bleu
+        new_cell = (-cell[0], cell[1]-cell[0])
+        ref_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+        #! symetrie axe rouge
+        new_cell = (cell[0] - cell[1], -cell[1])
+        ref_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+         #! autre axe 
+        new_cell = (cell[0], cell[0]-cell[1])
+        ref_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+        #! autre axe 
+        new_cell = (cell[1] - cell[0], cell[1])
+        ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
+
+
+#!---------------------- Alpha Beta ----------------------!#
+
+#cette section contient les fonctions nécessaires pour l'implémentation de l'algorithme alpha beta
+#TODO : implementer un alpha-beta, utilisant : 
+#TODO : -memoization avec hashage
+#TODO : -gestion des symetries, reflexions et rotations avec hashage
+#TODO : -une certaines profondeur de recherche
+#TODO : -un tri des noeuds en fonction des coupures alpha et beta
+#TODO ; multiprocess
+
+
+# def eval_grille_finale(dico_legaux: DictLegauxGopher, player_max:Player) -> int:
+#     if player_max == ROUGE:
+#         return score_final(dico_legaux)
+#     else:
+#         return -score_final(dico_legaux)
+
+
+
+def memoize(fonction):
+    """Memoize decorator pour la fonction alpha_beta"""
+    cache = {} # closure
+    def g(grille: Grid,dico_conversion:DictConv, player: Player):
+        grille_hashed = hashing(grille)
+        if grille_hashed in cache: 
+            # print("Appel memoize")
+            return cache[grille_hashed]
+
+        val = fonction(grille, player) #! c'est bien grille et non grille_hashed
+        cache[grille_hashed] = val
+        ref = reflexion(grille, dico_conversion)
+        for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
+            grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
+            for grille_ref_rot in grille_rot:
+                cache[hashing(grille_ref_rot)] = val #! on fini par append le hash des 36 grilles dans le cache
+        return val
+    return g
+
+def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_legaux: DictLegauxGopher, player_max:Player) -> List[ActionGopher]:
+    """Trie les actions en fonction du joueur"""
+    liste_values = []
+    if player_max == ROUGE:
+        for action in liste_actions:
+            _, dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
+            liste_values.append(score_final(dico_legaux))
+    else :
+        for action in liste_actions:
+            _, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
+            liste_values.append(score_final(dico_legaux))
+    return [x for y, x in sorted(zip(liste_values, liste_actions), key=lambda y:y[0])]
+
+
+
+
+@memoize
+def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux : DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
+    if depth == 0 or score_final(dico_legaux) != 0:
+        return score_final(dico_legaux), None
+
+    if player_max == ROUGE:
+        best_value = -INF
+        best_action = None
+        for action in trier_actions(liste_coup_legaux(dico_legaux, ROUGE), player_max):
+            new_element = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
+            new_value, _ = alpha_beta(new_element[0],dico_conversion, BLEU, new_element[1], depth - 1, alpha, beta)
+            if new_value > best_value:
+                best_value = new_value
+                best_action = action
+            alpha = max(alpha, new_value)
+            if beta <= alpha:
+                break  # Coupe bêta
+        return best_value, best_action
+    else:
+        min_value = INF
+        best_action = None
+        for action in trier_actions(liste_coup_legaux(dico_legaux, BLEU), player_max):
+            new_value, _ = alpha_beta(new_element[0],dico_conversion, ROUGE, new_element[1], depth - 1, alpha, beta)
+            if new_value < min_value:
+                min_value = new_value
+                best_action = action
+            beta = min(beta, new_value)
+            if beta <= alpha:
+                break  # Coupe alpha
+        return min_value, best_action
