@@ -486,10 +486,6 @@ def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_l
 
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-#
-
-
-
 @memoize
 def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux : DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
     if depth == 0 or score_final(dico_legaux) != 0:
@@ -530,21 +526,51 @@ def alpha_beta_bestcoup(grille : Grid,dico_conversion : DictConv, player : Playe
     best_action = None
     alpha = -INF
     beta = INF
-    for action in liste_coup_legaux(dico_legaux, player):
-        grid_suiv, dico_legaux_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
-        if player == ROUGE:
-            value, _ = alpha_beta(grid_suiv, dico_conversion,BLEU,dico_legaux_suiv, depth, alpha, beta)
-            if value > best_value_max:
-                best_value_max = value
-                best_action = action
-        elif player == BLEU:
-            value, _ = alpha_beta(grid_suiv, dico_conversion, ROUGE, dico_legaux_suiv, depth, alpha, beta)
-            if value < best_value_min:
-                best_value_min = value
-                best_action = action
+    if __name__ == "__main__":
+        best_action=main(grille,dico_conversion,best_action,player,dico_legaux,depth,alpha,beta)
+    # for action in liste_coup_legaux(dico_legaux, player):
+    #     grid_suiv, dico_legaux_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
+    #     if player == ROUGE:
+    #         value, _ = alpha_beta(grid_suiv, dico_conversion,BLEU,dico_legaux_suiv, depth, alpha, beta)
+    #         if value > best_value_max:
+    #             best_value_max = value
+    #             best_action = action
+    #     elif player == BLEU:
+    #         value, _ = alpha_beta(grid_suiv, dico_conversion, ROUGE, dico_legaux_suiv, depth, alpha, beta)
+    #         if value < best_value_min:
+    #             best_value_min = value
+    #             best_action = action
     return best_action
 
 
+def suivant_alpha_beta(grid:Grid,dico_conversion:DictConv,action:ActionGopher,player:Player,dico_legaux:DictLegauxGopher,depth:int,alpha:int,beta:int) -> Tuple[Score,Player,ActionGopher]:
+    grid_suiv, dico_legaux_suiv = play_action(grid, dico_conversion, action, player, dico_legaux)
+    if player == ROUGE:
+        value, _ = alpha_beta(grid_suiv, dico_conversion,BLEU,dico_legaux_suiv, depth, alpha, beta)
+    elif player == BLEU:
+        value, _ = alpha_beta(grid_suiv, dico_conversion, ROUGE, dico_legaux_suiv, depth, alpha, beta)
+    return (value,player,action)
+
+def main(grid:Grid,dico_conversion:DictConv,bast_action:ActionGopher,player:Player,dico_legaux:DictLegauxGopher,depth:int,alpha:int,beta:int):
+    print("Création d'un POOL sur", mp.cpu_count(), "coeurs")
+    pool = mp.Pool(mp.cpu_count())
+    values_action=[]
+    for action in liste_coup_legaux(dico_legaux, player):
+        print([(grid, dico_conversion, action, player, dico_legaux, depth, alpha, beta) for action in liste_coup_legaux(dico_legaux, player)])
+        values_action.append(pool.starmap(suivant_alpha_beta, [(grid, dico_conversion, action, player, dico_legaux, depth, alpha, beta) for action in liste_coup_legaux(dico_legaux, player)]))
+    pool.close()
+    print("Fermeture du POOL")
+    values_action_BLEU=[value for value in values_action if value[1]==BLEU]
+    values_action_ROUGE=[value for value in values_action if value[1]==ROUGE]
+    for elt in values_action_ROUGE:
+        if elt[0]>best_value_max:
+            best_value_max=elt[0]
+            best_action=elt[2]
+    for elt in values_action_BLEU:
+        if elt[0]<best_value_min:
+            best_value_min=elt[0]
+            best_action=elt[2]
+    return best_action
 
 
 def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
