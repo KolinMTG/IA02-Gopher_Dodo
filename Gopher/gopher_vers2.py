@@ -114,7 +114,7 @@ def init_dico_legaux_gopher(grille:Grid, dico_conversion:DictConv) -> DictLegaux
     return dico_legaux
 
 def play_action(grille:Grid, dico_conversion:DictConv, action:ActionGopher, joueur:Player, dict_legaux : DictLegauxGopher) -> Tuple[Grid, DictLegauxGopher]: 
-    """Joue un coup pour un joueur donné, /!\ verifier que l'action est légale, l'action est de type Cell_hex"""
+    """Joue un coup pour un joueur donné, /!\\ verifier que l'action est légale, l'action est de type Cell_hex"""
     cell_mat = dico_conversion[action]
     grille[cell_mat[0]][cell_mat[1]] = joueur
     dict_legaux = update_dico_legaux(dict_legaux, grille, dico_conversion, action)
@@ -551,25 +551,34 @@ def suivant_alpha_beta(grid:Grid,dico_conversion:DictConv,action:ActionGopher,pl
         value, _ = alpha_beta(grid_suiv, dico_conversion, ROUGE, dico_legaux_suiv, depth, alpha, beta)
     return (value,player,action)
 
-def main(grid:Grid,dico_conversion:DictConv,bast_action:ActionGopher,player:Player,dico_legaux:DictLegauxGopher,depth:int,alpha:int,beta:int):
-    print("Création d'un POOL sur", mp.cpu_count(), "coeurs")
-    pool = mp.Pool(mp.cpu_count())
+def main(grid:Grid,dico_conversion:DictConv,best_action:ActionGopher,player:Player,dico_legaux:DictLegauxGopher,depth:int,alpha:int,beta:int):
+    best_value_max = -INF
+    best_value_min = INF
+    actions = liste_coup_legaux(dico_legaux, player)
+    if len(actions) < mp.cpu_count():
+        pool = mp.Pool(len(actions))
+    else:
+        pool = mp.Pool(mp.cpu_count())
     values_action=[]
     for action in liste_coup_legaux(dico_legaux, player):
-        print([(grid, dico_conversion, action, player, dico_legaux, depth, alpha, beta) for action in liste_coup_legaux(dico_legaux, player)])
-        values_action.append(pool.starmap(suivant_alpha_beta, [(grid, dico_conversion, action, player, dico_legaux, depth, alpha, beta) for action in liste_coup_legaux(dico_legaux, player)]))
-    pool.close()
-    print("Fermeture du POOL")
-    values_action_BLEU=[value for value in values_action if value[1]==BLEU]
-    values_action_ROUGE=[value for value in values_action if value[1]==ROUGE]
+        values_action.append(pool.starmap(suivant_alpha_beta, [(grid, dico_conversion, action, player, dico_legaux, depth, alpha, beta) for action in actions]))
+    pool.terminate()
+    values_action_org = [] 
+    for elt in values_action:
+        for el in elt:
+            values_action_org.append(el)
+    values_action_BLEU=[value for value in values_action_org if value[1]==BLEU]
+    values_action_ROUGE=[value for value in values_action_org if value[1]==ROUGE]
     for elt in values_action_ROUGE:
-        if elt[0]>best_value_max:
+        if elt[0]>=best_value_max:
             best_value_max=elt[0]
             best_action=elt[2]
     for elt in values_action_BLEU:
-        if elt[0]<best_value_min:
+        if elt[0]<=best_value_min:
             best_value_min=elt[0]
             best_action=elt[2]
+    del values_action_org
+    del values_action
     return best_action
 
 
@@ -603,11 +612,11 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
     return score_final(dico_legaux)
 
 
-#boucle = 0
-#for i in tqdm(range(100)):
-#    boucle += boucle_rd_alpha_beta(6, 3)
-# boucle_rd_alpha_beta(6, 6)
-#print(boucle)
-print("alphabeta test")
+def test():
+    boucle = 0
+    for i in tqdm(range(100)):
+        boucle += boucle_rd_alpha_beta(6, 3)
+    print(boucle)
+#print("alphabeta test")
 
-print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
+#print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
