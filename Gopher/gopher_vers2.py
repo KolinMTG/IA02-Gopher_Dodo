@@ -424,7 +424,9 @@ def memoize(fonction):
         for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
             grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
             for grille_ref_rot in grille_rot:
-                cache[hashing(grille_ref_rot)] = val #! on fini par append le hash des 36 grilles dans le cache
+                grille_ref_rot_hashed = hashing(grille_ref_rot)
+                if grille_ref_rot_hashed not in cache:
+                    cache[grille_ref_rot_hashed] = val #! on fini par append le hash des 36 grilles dans le cache
         return val
     return g
 
@@ -439,7 +441,7 @@ def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_l
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             liste_values.append(score_final(dico_legaux))
-    print([x for _, x in sorted(zip(liste_values, liste_actions))])
+    #print([x for _, x in sorted(zip(liste_values, liste_actions))])
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
 #, key=lambda y:y[0]
@@ -528,14 +530,14 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
         if final(joueur, dico_legaux):
             break
     
-        # aff.afficher_hex(grille, dico_conversion=dico_conversion)
+        #aff.afficher_hex(grille, dico_conversion=dico_conversion)
     return score_final(dico_legaux)
 
 
-# boucle = 0
-# for i in tqdm(range(100)):
-#     boucle += boucle_rd_alpha_beta(6, 3)
-# # boucle_rd_alpha_beta(6, 6)
-# print(boucle)
+#boucle = 0
+#for i in tqdm(range(100)):
+#    boucle += boucle_rd_alpha_beta(6, 3)
+# boucle_rd_alpha_beta(6, 6)
+#print(boucle)
 
 print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
