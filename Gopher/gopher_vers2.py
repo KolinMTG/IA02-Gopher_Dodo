@@ -188,8 +188,8 @@ def final(player : Player, dico_legaux: DictLegauxGopher) -> bool: #!OK
 
 def score_final(dico_legaux: DictLegauxGopher) -> int: #!OK
     """Renvoie le score final, renvoie 0 si la partie n'est pas fini, 1 si le joueur ROUGE a gagné, -1 si le joueur BLEU a gagné"""
-    if liste_coup_legaux(dico_legaux, ROUGE) == []: return -1
-    if liste_coup_legaux(dico_legaux, BLEU) == []: return 1
+    if liste_coup_legaux(dico_legaux, ROUGE) == []: return -INF
+    if liste_coup_legaux(dico_legaux, BLEU) == []: return INF
     return 0
 
 
@@ -229,7 +229,7 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
 #     boucle += boucle_rd_rd(6)
 # print(boucle)
 
-print(boucle_rd_rd(6)) #normalement 1 ou -1
+# print(boucle_rd_rd(6)) #normalement 1 ou -1
 
 
 
@@ -344,30 +344,30 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
         new_cell = (cell[1], cell[1]-cell[0])
         rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
 
-    print("rotation 0")
-    aff.afficher_hex(grille, dico_conversion)
-    print("rotation 1")
-    aff.afficher_hex(rot_1, dico_conversion)
-    print("rotation 2")
-    aff.afficher_hex(rot_2, dico_conversion)
-    print("rotation 3")
-    aff.afficher_hex(rot_3, dico_conversion)
-    print("rotation 4")
-    aff.afficher_hex(rot_4, dico_conversion)
-    print("rotation 5")
-    aff.afficher_hex(rot_5, dico_conversion)
+    # print("rotation 0")
+    # aff.afficher_hex(grille, dico_conversion)
+    # print("rotation 1")
+    # aff.afficher_hex(rot_1, dico_conversion)
+    # print("rotation 2")
+    # aff.afficher_hex(rot_2, dico_conversion)
+    # print("rotation 3")
+    # aff.afficher_hex(rot_3, dico_conversion)
+    # print("rotation 4")
+    # aff.afficher_hex(rot_4, dico_conversion)
+    # print("rotation 5")
+    # aff.afficher_hex(rot_5, dico_conversion)
 
 
 
     return [grille, rot_1, rot_2, rot_3, rot_4, rot_5]
     
 # #!test
-grille, dico_conversion = init_grille_gopher(6)
-grille, dico_legaux = play_action(grille, dico_conversion, (1,1), ROUGE, init_dico_legaux_gopher(grille, dico_conversion))
-grille, dico_legaux = play_action(grille, dico_conversion, (1,2), BLEU, dico_legaux)
-grille, dico_legaux = play_action(grille, dico_conversion, (2,1), ROUGE, dico_legaux)
-grille, dico_legaux = play_action(grille, dico_conversion, (2,2), BLEU, dico_legaux)
-rotation(grille, dico_conversion)
+# grille, dico_conversion = init_grille_gopher(6)
+# grille, dico_legaux = play_action(grille, dico_conversion, (1,1), ROUGE, init_dico_legaux_gopher(grille, dico_conversion))
+# grille, dico_legaux = play_action(grille, dico_conversion, (1,2), BLEU, dico_legaux)
+# grille, dico_legaux = play_action(grille, dico_conversion, (2,1), ROUGE, dico_legaux)
+# grille, dico_legaux = play_action(grille, dico_conversion, (2,2), BLEU, dico_legaux)
+# rotation(grille, dico_conversion)
 
 
 def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
@@ -404,27 +404,27 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
         #! autre axe 
         new_cell = (cell[1] - cell[0], cell[1])
         ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
-    print("reflexion 1")
-    aff.afficher_hex(ref_1, dico_conversion)
-    print("reflexion 2")
-    aff.afficher_hex(ref_2, dico_conversion)
-    print("reflexion 3")
-    aff.afficher_hex(ref_3, dico_conversion)
-    print("reflexion 4")
-    aff.afficher_hex(ref_4, dico_conversion)
-    print("reflexion 5")
-    aff.afficher_hex(ref_5, dico_conversion)
-    print("reflexion 6")
-    aff.afficher_hex(ref_6, dico_conversion)
+    # print("reflexion 1")
+    # aff.afficher_hex(ref_1, dico_conversion)
+    # print("reflexion 2")
+    # aff.afficher_hex(ref_2, dico_conversion)
+    # print("reflexion 3")
+    # aff.afficher_hex(ref_3, dico_conversion)
+    # print("reflexion 4")
+    # aff.afficher_hex(ref_4, dico_conversion)
+    # print("reflexion 5")
+    # aff.afficher_hex(ref_5, dico_conversion)
+    # print("reflexion 6")
+    # aff.afficher_hex(ref_6, dico_conversion)
     return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
 
 # #!test
-grille, dico_conversion = init_grille_gopher(6)
-grille, dico_legaux = play_action(grille, dico_conversion, (1,1), ROUGE, init_dico_legaux_gopher(grille, dico_conversion))
-grille, dico_legaux = play_action(grille, dico_conversion, (1,2), BLEU, dico_legaux)
-grille, dico_legaux = play_action(grille, dico_conversion, (2,1), ROUGE, dico_legaux)
-grille, dico_legaux = play_action(grille, dico_conversion, (2,2), BLEU, dico_legaux)
-reflexion(grille, dico_conversion)
+# grille, dico_conversion = init_grille_gopher(6)
+# grille, dico_legaux = play_action(grille, dico_conversion, (1,1), ROUGE, init_dico_legaux_gopher(grille, dico_conversion))
+# grille, dico_legaux = play_action(grille, dico_conversion, (1,2), BLEU, dico_legaux)
+# grille, dico_legaux = play_action(grille, dico_conversion, (2,1), ROUGE, dico_legaux)
+# grille, dico_legaux = play_action(grille, dico_conversion, (2,2), BLEU, dico_legaux)
+# reflexion(grille, dico_conversion)
 
 
 #!---------------------- Alpha Beta ----------------------!#
@@ -436,13 +436,17 @@ reflexion(grille, dico_conversion)
 #// TODO : -une certaines profondeur de recherche
 #// TODO : -un tri des noeuds en fonction des coupures alpha et beta
 #TODO ; multiprocess
+#TODO ; ecrire une fonction d'evalueation qui marche a des positions intermediaire du jeu, renvoie +INF, -INF si ROuge ou bleu gagne et sinon le nombre de coup legaux de ROUGE - le nombre de coup legaux de BLEU
 
 
-# def eval_grille_finale(dico_legaux: DictLegauxGopher, player_max:Player) -> int:
-#     if player_max == ROUGE:
-#         return score_final(dico_legaux)
-#     else:
-#         return -score_final(dico_legaux)
+def evaluation(dico_legaux: DictLegauxGopher) -> int:
+    """Evalue une action"""
+    score = score_final(dico_legaux)
+    if score :
+        return score
+    else : 
+        return len([key for key in dico_legaux[ROUGE].keys() if dico_legaux[ROUGE][key]]) - len([key for key in dico_legaux[BLEU].keys() if dico_legaux[BLEU][key]])
+
 
 
 
@@ -467,28 +471,29 @@ def memoize(fonction):
         return val
     return g
 
+#! fonction trier_action est OK 
 def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_legaux: DictLegauxGopher, player_max:Player) -> List[ActionGopher]:
     """Trie les actions en fonction du joueur"""
     liste_values = []
     if player_max == ROUGE:
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
-            liste_values.append(score_final(dico_legaux))
+            liste_values.append(evaluation(dico_legaux))
     else :
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
-            liste_values.append(score_final(dico_legaux))
-    #print([x for _, x in sorted(zip(liste_values, liste_actions))])
+            liste_values.append(evaluation(dico_legaux))
+
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-#, key=lambda y:y[0]
+#
 
 
 
 @memoize
 def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux : DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
     if depth == 0 or score_final(dico_legaux) != 0:
-        return score_final(dico_legaux), None
+        return evaluation(dico_legaux), None
 
     if player_max == ROUGE:
         best_value = -INF
@@ -577,5 +582,6 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 #    boucle += boucle_rd_alpha_beta(6, 3)
 # boucle_rd_alpha_beta(6, 6)
 #print(boucle)
+print("alphabeta test")
 
-# print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
+print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
