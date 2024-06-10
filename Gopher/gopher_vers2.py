@@ -451,12 +451,12 @@ def evaluation(dico_legaux: DictLegauxGopher, joueur_actif : Player) -> int:
         return len([key for key in dico_legaux[ROUGE].keys() if dico_legaux[ROUGE][key]]) - len([key for key in dico_legaux[BLEU].keys() if dico_legaux[BLEU][key]])
 
 #!test
-grille, dico_conversion = init_grille_gopher(6)
-dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-grille, dico_legaux = play_action(grille, dico_conversion, (0,0), ROUGE, dico_legaux)
-print(dico_legaux)
-print(evaluation(dico_legaux, BLEU)) #normalement 0
-print (dico_legaux)
+# grille, dico_conversion = init_grille_gopher(6)
+# dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+# grille, dico_legaux = play_action(grille, dico_conversion, (0,0), ROUGE, dico_legaux)
+# print(dico_legaux)
+# print(evaluation(dico_legaux, BLEU)) #normalement 0
+# print (dico_legaux)
 
 
 # def memoize(fonction):
@@ -490,63 +490,69 @@ def trier_actions(grid, dico_conversion, liste_actions:List[ActionGopher],dico_l
         for action in liste_actions:
             new_dict = {ROUGE:copy.deepcopy(dico_legaux[ROUGE]), BLEU:copy.deepcopy(dico_legaux[BLEU])}
             _, new_dict = play_action(grid, dico_conversion, action, BLEU, new_dict)
-            liste_values.append(evaluation(new_dict))
+            liste_values.append(evaluation(new_dict, ROUGE))
     else :
         
         for action in liste_actions:
             new_dict = {ROUGE:copy.deepcopy(dico_legaux[ROUGE]), BLEU:copy.deepcopy(dico_legaux[BLEU])}
             _, new_dict = play_action(grid, dico_conversion, action, ROUGE, new_dict)
-            liste_values.append(evaluation(new_dict))
+            liste_values.append(evaluation(new_dict, BLEU))
 
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
 
-print("test trier_actions")
-grille, dico_conversion = init_grille_gopher(6)
-dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-grille, dico_legaux = play_action(grille, dico_conversion, (0,0), ROUGE, dico_legaux)
-print("Liste des actions legales de Rouge : ", liste_coup_legaux(dico_legaux, ROUGE)) #!test
-print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE), dico_legaux, ROUGE)) #!test
-print("Liste des actions legales de Bleu : ", liste_coup_legaux(dico_legaux, BLEU)) #!test
-print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, BLEU), dico_legaux, BLEU)) #!test
+# print("test trier_actions")
+# grille, dico_conversion = init_grille_gopher(6)
+# dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+# grille, dico_legaux = play_action(grille, dico_conversion, (0,0), ROUGE, dico_legaux)
+# print("Liste des actions legales de Rouge : ", liste_coup_legaux(dico_legaux, ROUGE)) #!test
+# print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE), dico_legaux, ROUGE)) #!test
+# print("Liste des actions legales de Bleu : ", liste_coup_legaux(dico_legaux, BLEU)) #!test
+# print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, BLEU), dico_legaux, BLEU)) #!test
 
 
 # @memoize
-# def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux : DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
-#     if depth == 0 or final(player_max, dico_legaux):
-#         return evaluation(dico_legaux), None
+def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux: DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
 
-#     if player_max == ROUGE:
-#         best_value = -INF
-#         best_action = None
-#         for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):#! pas d'erreur dans trier_actions
-#             if action not in liste_coup_legaux(dico_legaux, BLEU): #!test
-#                 print("!!!!!!!!!!!!!!!!!!!!!erreur!!!!!!!!!!!!!!!!!!!!") #!test
-            
-#             new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
-#             new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
-#             if new_value > best_value:
-#                 best_value = new_value
-#                 best_action = action
-#             alpha = max(alpha, new_value)
-#             if beta <= alpha:
-#                 break  # Coupe bêta
-#         return best_value, best_action
-#     else: #! problème quelquepart dans bleu
-#         min_value = INF
-#         best_action = None
-#         for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max): #! pas d'erreur dans trier_actions
-#             if action not in liste_coup_legaux(dico_legaux, BLEU): #!test
-#                 print("!!!!!!!!!!!!!!!!!!!!!erreur!!!!!!!!!!!!!!!!!!!!") #!test
-#             new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
-#             new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dico_legaux, depth - 1, alpha, beta)
-#             if new_value < min_value:
-#                 min_value = new_value
-#                 best_action = action
-#             beta = min(beta, new_value)
-#             if beta <= alpha:
-#                 break  # Coupe alpha
-#         return min_value, best_action
+    if depth == 0 or final(player_max, dico_legaux):
+        return evaluation(dico_legaux, player_max), None
+
+    if player_max == ROUGE:
+        best_value = -INF
+        best_action = None
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):#! pas d'erreur dans trier_actions
+            new_dico_legaux = copy.deepcopy(dico_legaux)
+            new_dict_temp = copy.deepcopy(dico_legaux)
+            # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, new_dict_temp)
+            new_dict_temp = copy.deepcopy(new_dico_legaux)
+            # new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
+            new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dict_temp, depth - 1, alpha, beta)
+            if new_value > best_value:
+                best_value = new_value
+                best_action = action
+            alpha = max(alpha, new_value)
+            if beta <= alpha:
+                break  # Coupe bêta
+        return best_value, best_action
+    else: #! problème quelquepart dans bleu
+        min_value = INF
+        best_action = None
+        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max): #! pas d'erreur dans trier_actions
+            new_dico_legaux = copy.deepcopy(dico_legaux)
+            new_dict_temp = copy.deepcopy(dico_legaux)
+            # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, new_dict_temp)
+            new_dict_temp = copy.deepcopy(new_dico_legaux)
+            # new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dico_legaux, depth - 1, alpha, beta)
+            new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dict_temp, depth - 1, alpha, beta)
+            if new_value < min_value:
+                min_value = new_value
+                best_action = action
+            beta = min(beta, new_value)
+            if beta <= alpha:
+                break  # Coupe alpha
+        return min_value, best_action
 
 # def alpha_beta_bestcoup(grille : Grid,dico_conversion : DictConv, player : Player, dico_legaux : DictLegauxGopher, depth) -> Action:
 #     grid = copy.deepcopy(grille) #!erreur potentiellement dans alpha_beta_bestcoup
@@ -572,43 +578,42 @@ print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, BLEU
 
 
 
-# def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
-#     """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
+def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
+    """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
 
-#     grille, dico_conversion = init_grille_gopher(taille_grille)
-#     dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-#     actions_possible = list(dico_conversion.keys())
-#     joueur = ROUGE
-#     action_debut = rd.choice(actions_possible)
-#     grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
+    grille, dico_conversion = init_grille_gopher(taille_grille)
+    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    actions_possible = list(dico_conversion.keys())
+    joueur = ROUGE
+    action_debut = rd.choice(actions_possible)
+    grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
 
-#     joueur = ROUGE if joueur == BLEU else BLEU
-#     while True:
-#         actions_legales = liste_coup_legaux(dico_legaux, joueur)
-#         if joueur == ROUGE:
+    joueur = ROUGE if joueur == BLEU else BLEU
+    while True:
+        actions_legales = liste_coup_legaux(dico_legaux, joueur)
+        if joueur == ROUGE:
             
-#             action = alpha_beta_bestcoup(grille, dico_conversion, joueur, dico_legaux, depth)
-#             print(liste_coup_legaux(dico_legaux, joueur))
-#             if action not in liste_coup_legaux(dico_legaux, joueur):
-#                 print("erreur")
-
-            
-#         else:  # joueur == BLEU
-#             action = rd.choice(actions_legales)
+            action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -INF, INF)[1]
+            print(liste_coup_legaux(dico_legaux, joueur))
+            if action not in liste_coup_legaux(dico_legaux, joueur):
+                print("erreur")
 
             
-#         grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
+        else:  # joueur == BLEU
+            action = rd.choice(actions_legales)
+
+        grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
         
-#         aff.afficher_hex(grille, dico_conversion=dico_conversion)
-#         joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
         
-#         if final(joueur, dico_legaux):
-#             # aff.afficher_hex(grille, dico_conversion=dico_conversion)
-#             break
+        joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
+        
+        if final(joueur, dico_legaux):
+            aff.afficher_hex(grille, dico_conversion=dico_conversion)
+            break
+    # aff.afficher_hex(grille, dico_conversion=dico_conversion)
+    return score_final(dico_legaux)
 
-#     return score_final(dico_legaux)
-
-# boucle_rd_alpha_beta(6, 3)
+boucle_rd_alpha_beta(6, 3)
 
 
 # boucle = 0
@@ -621,7 +626,63 @@ print(trier_actions(grille, dico_conversion, liste_coup_legaux(dico_legaux, BLEU
 # print(boucle_rd_alpha_beta(6, 3))  # normalement 1 ou -1
 
 
-def alpha_beta_2(grid : Grid, dico_conversion : DictConv, dico_legaux : DictLegauxGopher, depth, alpha, beta, player_max : Player) -> Tuple[Score, ActionGopher]:
+def alpha_beta_2(grid : Grid, dico_conversion : DictConv, dico_leg: DictLegauxGopher, depth, alpha, beta, player_max : Player) -> Tuple[Score, ActionGopher]:
+    dico_legaux = copy.deepcopy(dico_leg)
+    
     if depth == 0 or final(player_max, dico_legaux):
-        return evaluation(dico_legaux), None
+        return evaluation(dico_legaux, player_max), None
+    
+    if player_max == ROUGE: #joueur max
+        best_value = -INF
+        best_action = None
+        for actions in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE), dico_legaux, player_max):
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, actions, ROUGE, dico_legaux)
+            new_value, _ = alpha_beta_2(new_grid, dico_conversion, new_dico_legaux, depth - 1, alpha, beta, BLEU)
+            if new_value > best_value:
+                best_value = new_value
+                best_action = actions
+            alpha = max(alpha, new_value)
+            if beta <= alpha:
+                break
+        return best_value, best_action
+
+    else : #joueur min
+        best_value = INF
+        best_action = None
+        for actions in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU), dico_legaux, player_max):
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, actions, BLEU, dico_legaux)
+            new_value, _ = alpha_beta_2(new_grid, dico_conversion, new_dico_legaux, depth - 1, alpha, beta, ROUGE)
+            if new_value < best_value:
+                best_value = new_value
+                best_action = actions
+            beta = min(beta, new_value)
+            if beta <= alpha:
+                break
+        return best_value, best_action
+    
+
+#!test
+# def tester_dico(dico_legaux:DictLegauxGopher):
+#     print("BLEU")
+#     print(liste_coup_legaux(dico_legaux, BLEU))
+#     print("ROUGE")
+#     print(liste_coup_legaux(dico_legaux, ROUGE))    
+
+# grille, dico_conversion = init_grille_gopher(6)
+# dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+
+# grille, dico_legaux = play_action(grille, dico_conversion, (0,0), ROUGE, dico_legaux)
+# tester_dico(dico_legaux)
+
+# print("Appel alpha_beta_2")
+# print(alpha_beta_2(grille, dico_conversion, dico_legaux, 3, -INF, INF, BLEU)) #normalement 0
+# tester_dico(dico_legaux)
+
+# print("Appel play action")
+# grille, dico_legaux = play_action(grille, dico_conversion, (0,1), BLEU, dico_legaux)
+# tester_dico(dico_legaux)
+# print(alpha_beta_2(grille, dico_conversion, dico_legaux, 3, -INF, INF, ROUGE)) #normalement 0
+
+
+
 
