@@ -39,6 +39,24 @@ ROUGE = 1
 BLEU = 2 
 NDEF = -1 # a utiliser pour les cases qui n'existes pas
 
+def tuple_to_list(t: Tuple) -> List:
+    """Transforme un tuple en liste"""
+    liste_tmp = [t[i] for i in range(len(t))]
+    for i in range(len(liste_tmp)):
+        if type(liste_tmp[i]) == tuple:
+            liste_tmp[i] = tuple_to_list(liste_tmp[i])
+    return liste_tmp
+
+#!test
+print(tuple_to_list(((1,2), (3,4), (5,6))))
+
+def liste_to_tuple(l: List) -> Tuple:
+    """Transforme une liste en tuple"""
+    liste_tmp = [tuple(l[i]) for i in range(len(l))]
+    return tuple(liste_tmp)
+
+#!test
+print(liste_to_tuple([[1,2], [3,4], [5,6]]))
 
 
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
@@ -61,6 +79,8 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!O
         for j in range(taille_array-compteur):
             dico_conversion[(j-taille_grille, taille_grille-i)] = (i,j)
         compteur +=1
+
+    
     
     for key in dico_conversion.keys(): #initialisation de la grille : toutes les cases qui ne sont pas en clé du dico n'existent pas
         x_cell, y_cell = dico_conversion[key] #! type de dico_conversion[key] : Cell_mat
@@ -70,12 +90,17 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!O
             grille[x_cell][y_cell] = ROUGE
         else:
             grille[x_cell][y_cell] = EMPTY #on remplit la grille avec les cases vides
-    return grille, dico_conversion, {ROUGE: [(1,0),(0,1), (1,1)], BLEU: [(-1,0), (-1, -1), (0,-1)]}
+
+    liste_tmp = [tuple(grille[i]) for i in range(taille_array)] 
+    grille_finale = tuple(liste_tmp)
+    return grille_finale, dico_conversion, {ROUGE: [(1,0),(0,1), (1,1)], BLEU: [(-1,0), (-1, -1), (0,-1)]}
+
+
 
 #!test
 grille, dico_conversion, direction = init_grille_dodo(3)
-# print(grille)
-# print(dico_conversion)
+print(grille)
+print(dico_conversion)
 aff.afficher_hex(grille, dico_conversion)
 
 
@@ -140,8 +165,10 @@ def liste_coup_legaux(grille: Grid, dico_conversion: Dict, direction: DirectionJ
 def play_action(grille: Grid, dico_conversion: Dict, action: ActionDodo, joueur: Player) -> Grid:
     """Renvoie la grille après avoir joué un coup"""
     cell_depart, cell_arrivee = action
-    grille[dico_conversion[cell_depart][0]][dico_conversion[cell_depart][1]] = EMPTY
-    grille[dico_conversion[cell_arrivee][0]][dico_conversion[cell_arrivee][1]] = joueur
+    grille_tmp = tuple_to_list(grille)
+    grille_tmp[dico_conversion[cell_depart][0]][dico_conversion[cell_depart][1]] = EMPTY
+    grille_tmp[dico_conversion[cell_arrivee][0]][dico_conversion[cell_arrivee][1]] = joueur
+    grille = liste_to_tuple(grille_tmp)
     return grille
 
 
@@ -191,35 +218,44 @@ def rd_rd_dodo() -> float:
 
 #!test
 
-X = [i for i in range(1, 11)]
-Y = [0 for i in range(1, 11)]
-for i in range(100):
-    boucle = 0
-    for i in range(10):
-        if rd_rd_dodo() == INF:
-            boucle += 1
-    Y[boucle] += 1
-plt.plot(X, Y)
-plt.show()
+# X = [i for i in range(1, 11)]
+# Y = [0 for i in range(1, 11)]
+# for i in range(100):
+#     boucle = 0
+#     for i in range(10):
+#         if rd_rd_dodo() == INF:
+#             boucle += 1
+#     Y[boucle] += 1
+# plt.plot(X, Y)
+# plt.show()
 
 
+def trier_actions(grid, dico_conversion,direction, liste_actions:List[ActionGopher], player_max:Player) -> List[ActionGopher]:
+    """Trie les actions en fonction du joueur"""
+    liste_values = []
+    if player_max == ROUGE:
+        for action in liste_actions:
+            liste_values.append(score(grid, dico_conversion, direction, ROUGE))
+    else :
+        
+        for action in liste_actions:
+            liste_values.append(score(grid, dico_conversion, direction, BLEU))
 
-def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico_legaux: DictLegauxGopher, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
+    return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-    if depth == 0 or final(player_max, dico_legaux):
-        return evaluation(dico_legaux, player_max), None
+
+def alpha_beta_dodo(grid : Grid,dico_conversion,direction, player_max : Player, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
+
+    if depth == 0 or final(grille, dico_conversion, direction):
+        return final(grille, dico_conversion, direction), None
 
     if player_max == ROUGE:
         best_value = -INF
         best_action = None
-        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):#! pas d'erreur dans trier_actions
-            new_dico_legaux = copy.deepcopy(dico_legaux)
-            new_dict_temp = copy.deepcopy(dico_legaux)
-            # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
-            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, new_dict_temp)
-            new_dict_temp = copy.deepcopy(new_dico_legaux)
-            # new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
-            new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dict_temp, depth - 1, alpha, beta)
+        for action in trier_actions(grid, dico_conversion,direction, liste_coup_legaux(grille, dico_conversion, direction, ROUGE), player_max):#! pas d'erreur dans trier_actions
+
+            new_grid = play_action(grid, dico_conversion, action, ROUGE)
+            new_value, _ = alpha_beta_dodo(new_grid,dico_conversion,direction, BLEU, depth - 1, alpha, beta)
             if new_value > best_value:
                 best_value = new_value
                 best_action = action
@@ -227,24 +263,53 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
             if beta <= alpha:
                 break  # Coupe bêta
         return best_value, best_action
-    else: #! problème quelquepart dans bleu
-        min_value = INF
+    else:
+        best_value = INF
         best_action = None
-        for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max): #! pas d'erreur dans trier_actions
-            new_dico_legaux = copy.deepcopy(dico_legaux)
-            new_dict_temp = copy.deepcopy(dico_legaux)
-            # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
-            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, new_dict_temp)
-            new_dict_temp = copy.deepcopy(new_dico_legaux)
-            # new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dico_legaux, depth - 1, alpha, beta)
-            new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dict_temp, depth - 1, alpha, beta)
-            if new_value < min_value:
-                min_value = new_value
+        for action in trier_actions(grid, dico_conversion,direction, liste_coup_legaux(grille, dico_conversion, direction, BLEU), player_max):
+            new_grid = play_action(grid, dico_conversion, action, BLEU)
+            new_value, _ = alpha_beta_dodo(new_grid,dico_conversion,direction, ROUGE, depth - 1, alpha, beta)
+            if new_value < best_value:
+                best_value = new_value
                 best_action = action
             beta = min(beta, new_value)
             if beta <= alpha:
-                break  # Coupe alpha
-        return min_value, best_action
+                break
+
+        return best_value, best_action
+
+
+def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
+    """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
+
+    grille, dico_conversion, direction = init_grille_dodo(taille_grille)
+
+    while True:
+        liste_coups = liste_coup_legaux(grille, dico_conversion, direction, BLEU)
+        coup = rd.choice(liste_coups)
+        grille = play_action(grille, dico_conversion, coup, BLEU)
+
+        if final(grille, dico_conversion, direction):
+            break
+
+        _, coup = alpha_beta_dodo(grille, dico_conversion,direction, ROUGE, depth, -INF, INF)
+        print("Alpha BETA" ,coup)
+        grille = play_action(grille, dico_conversion, coup, ROUGE)
+
+        if final(grille, dico_conversion, direction):
+            break
+            
+        aff.afficher_hex(grille, dico_conversion)
+    return final(grille, dico_conversion, direction)
+
+
+# #!test
+print(boucle_rd_alpha_beta(3, 3))
+
+
+
+
+
 
 #TODO A FAIRE : 
 #TODO OBTERNIR LE SERVEUR DE TEST
