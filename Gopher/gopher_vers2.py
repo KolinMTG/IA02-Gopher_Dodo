@@ -45,6 +45,20 @@ Time = int
 
 #! ---------------------- FONCTIONS ---------------------- !#
 
+def dict_to_tuple(d):
+    """transforme un dictionnaire en tuple"""
+    return tuple((key, value) for key, value in d.items())
+
+def tuple_to_dict(t):
+    """transforme un tuple en dictionnaire"""
+    return dict(t)
+
+#!test
+d = {1:2, 3:4}
+t = dict_to_tuple(d)
+print(t)
+print(tuple_to_dict(t))
+
 def tuple_to_list(t: Tuple) -> List:
     """Transforme un tuple en liste"""
     liste_tmp = [t[i] for i in range(len(t))]
@@ -128,23 +142,26 @@ def voisins(dico_conversion : DictConv, pos:CellHex) -> List[CellHex]: #!OK
 # grille, dico_conversion = init_grille_gopher(6)
 # print(voisins(dico_conversion, (0,0))) #normalement [(7, 6), (5, 6), (6, 7), (6, 5), (5, 7), (7, 5)]
 
-def init_dico_legaux_gopher(grille:Grid, dico_conversion:DictConv) -> DictLegauxGopher: #! OK
+def init_dico_legaux_gopher(grille:Grid, dico_conversion:DictConv) -> DictLegauxGopher: 
     """Initialise le dictionnaire des coups légaux pour le gopher"""
     dico_legaux = {ROUGE:{}, BLEU:{}}
     for joueur in dico_legaux.keys():
         for action in dico_conversion.keys():
             dico_legaux[joueur][action] = False
-    return dico_legaux
+    dico_legaux_new = dict_to_tuple(dico_legaux)
+    return dico_legaux_new
 
 def play_action(grille:Grid, dico_conversion:DictConv, action:ActionGopher, joueur:Player, dict_legaux : DictLegauxGopher) -> Tuple[Grid, DictLegauxGopher]: 
     """Joue un coup pour un joueur donné, /!\ verifier que l'action est légale, l'action est de type Cell_hex"""
-
+    # print(grille)
     grille_tmp = tuple_to_list(grille)
+    # print(grille_tmp)
     cell_mat = dico_conversion[action]
     grille_tmp[cell_mat[0]][cell_mat[1]] = joueur
-    dict_legaux = update_dico_legaux(dict_legaux, grille, dico_conversion, action)
-    grille = liste_to_tuple(grille_tmp)
-    return grille, dict_legaux
+    
+    dict_legaux = update_dico_legaux(dict_legaux, grille_tmp, dico_conversion, action)
+    grille_final = liste_to_tuple(grille_tmp)
+    return grille_final, dict_legaux
 
 #!test
 # grille, dico_conversion = init_grille_gopher(6)
@@ -191,19 +208,23 @@ def est_legal(grille:Grid,dico_conversion: Dict , action:ActionGopher, joueur : 
 
 def liste_coup_legaux(dico_legaux:DictLegauxGopher, joueur:Player) -> List[ActionGopher]: #! OK
     """Renvoie la liste des coups légaux pour un joueur donné"""
+    dico_legaux = tuple_to_dict(dico_legaux)
     return [action for action in dico_legaux[joueur].keys() if dico_legaux[joueur][action] == True]
 
 def update_dico_legaux(dico_legaux:DictLegauxGopher, grille:Grid, dico_conversion:DictConv, action:ActionGopher) -> DictLegauxGopher: # ? A REVOIR
     """Met à jour le dictionnaire des coups légaux pour un joueur donné"""
-
+    new_dico_legaux = tuple_to_dict(dico_legaux)
+    
     for joueur in dico_legaux.keys():
+        
         dico_legaux[joueur][action] = False #on ne peut pas rejouer la case jouée en action
         for cell in voisins(dico_conversion, action): # update des cases voisines de la case jouée
             if est_legal(grille, dico_conversion, cell, joueur):
-
+                
                 dico_legaux[joueur][cell] = True
             else :
                 dico_legaux[joueur][cell] = False
+    dico_legaux_final = 
     return dico_legaux
 
 
@@ -230,7 +251,12 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
     action_debut = rd.choice(actions_possible)
     # print("Joueur de debut : ", joueur)
     # print("Action de debut : ", action_debut)
+  
     grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
+
+    
+
+
 
     # print("DicoLegaux: ", dico_legaux)
     # print("DicoLegaux UPDATE : ", dico_legaux)
@@ -343,7 +369,7 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
     rot_3 = copy.deepcopy(rot_1)
     rot_4 = copy.deepcopy(rot_1)
     rot_5 = copy.deepcopy(rot_1)
-    
+
 
     #!rotation 60°
     for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
@@ -398,7 +424,8 @@ def rotation(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
 
 def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
     """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
-    taille_grille = len(grille)//2 
+    new_grille = tuple_to_list(grille)
+    taille_grille = len(new_grille)//2 
     ref_1 = init_grille_gopher(taille_grille)[0]
     ref_2 = copy.deepcopy(ref_1)
     ref_3 = copy.deepcopy(ref_1)
@@ -442,7 +469,7 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
     # aff.afficher_hex(ref_5, dico_conversion)
     # print("reflexion 6")
     # aff.afficher_hex(ref_6, dico_conversion)
-    return [ref_1, ref_2, ref_3, ref_4, ref_5, ref_6]
+    return [liste_to_tuple(ref_1), liste_to_tuple(ref_2), liste_to_tuple(ref_3), liste_to_tuple(ref_4), liste_to_tuple(ref_5), liste_to_tuple(ref_6)]
 
 # #!test
 # grille, dico_conversion = init_grille_gopher(6)
@@ -547,13 +574,10 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
         best_value = -INF
         best_action = None
         for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, ROUGE),dico_legaux, player_max):#! pas d'erreur dans trier_actions
-            new_dico_legaux = copy.deepcopy(dico_legaux)
-            new_dict_temp = copy.deepcopy(dico_legaux)
             # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
-            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, new_dict_temp)
-            new_dict_temp = copy.deepcopy(new_dico_legaux)
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             # new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
-            new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dict_temp, depth - 1, alpha, beta)
+            new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
             if new_value > best_value:
                 best_value = new_value
                 best_action = action
@@ -565,13 +589,10 @@ def alpha_beta(grid : Grid,dico_conversion : DictConv, player_max : Player, dico
         min_value = INF
         best_action = None
         for action in trier_actions(grid, dico_conversion, liste_coup_legaux(dico_legaux, BLEU),dico_legaux, player_max): #! pas d'erreur dans trier_actions
-            new_dico_legaux = copy.deepcopy(dico_legaux)
-            new_dict_temp = copy.deepcopy(dico_legaux)
-            # new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
-            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, new_dict_temp)
-            new_dict_temp = copy.deepcopy(new_dico_legaux)
-            # new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dico_legaux, depth - 1, alpha, beta)
-            new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dict_temp, depth - 1, alpha, beta)
+
+            new_grid, new_dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
+
+            new_value, _ = alpha_beta(new_grid,dico_conversion, ROUGE, new_dico_legaux, depth - 1, alpha, beta)
             if new_value < min_value:
                 min_value = new_value
                 best_action = action
@@ -610,38 +631,41 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
     grille, dico_conversion = init_grille_gopher(taille_grille)
     dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
     actions_possible = list(dico_conversion.keys())
-    print(actions_possible)
+    # print(actions_possible)
+    compteur =0
     joueur = ROUGE
     action_debut = rd.choice(actions_possible)
     grille, dico_legaux = play_action(grille, dico_conversion, action_debut, joueur, dico_legaux)
 
     joueur = ROUGE if joueur == BLEU else BLEU
     while True:
-        actions_legales = liste_coup_legaux(dico_legaux, joueur)
-        if joueur == ROUGE:
-            
-            action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -INF, INF)[1]
-            print(liste_coup_legaux(dico_legaux, joueur))
-            if action not in liste_coup_legaux(dico_legaux, joueur):
-                print("erreur")
+        compteur +=1
+        
 
-            
+        if joueur == ROUGE:
+            action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -INF, INF)[1]
+            print("Alpha Beta, action : ", action)
+
+
         else:  # joueur == BLEU
+            actions_legales = liste_coup_legaux(dico_legaux, BLEU)
+            # print(dico_legaux)
+            # print(actions_legales)
             action = rd.choice(actions_legales)
+            print("Random, action : ", action)
 
         grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
         
-        
         joueur = ROUGE if joueur == BLEU else BLEU  # changement de joueur
         
-        if final(joueur, dico_legaux):
-            aff.afficher_hex(grille, dico_conversion=dico_conversion)
+        if final(joueur, dico_legaux) or compteur == 100:
+            # aff.afficher_hex(grille, dico_conversion=dico_conversion)
             break
+        aff.afficher_hex(grille, dico_conversion)
 
-        aff.afficher_hex(grille, dico_conversion=dico_conversion)
     return score_final(dico_legaux)
 
-boucle_rd_alpha_beta(6, 3)
+boucle_rd_alpha_beta(6, 4)
 
 
 # boucle = 0

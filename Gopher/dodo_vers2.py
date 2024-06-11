@@ -98,7 +98,7 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]: #!O
 
 
 #!test
-grille, dico_conversion, direction = init_grille_dodo(3)
+grille, dico_conversion, direction = init_grille_dodo(6)
 print(grille)
 print(dico_conversion)
 aff.afficher_hex(grille, dico_conversion)
@@ -252,6 +252,7 @@ def alpha_beta_dodo(grid : Grid,dico_conversion,direction, player_max : Player, 
     if player_max == ROUGE:
         best_value = -INF
         best_action = None
+        print("rouge", liste_coup_legaux(grille, dico_conversion, direction, ROUGE))
         for action in trier_actions(grid, dico_conversion,direction, liste_coup_legaux(grille, dico_conversion, direction, ROUGE), player_max):#! pas d'erreur dans trier_actions
 
             new_grid = play_action(grid, dico_conversion, action, ROUGE)
@@ -286,8 +287,12 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 
     while True:
         liste_coups = liste_coup_legaux(grille, dico_conversion, direction, BLEU)
+        
         coup = rd.choice(liste_coups)
+        aff.afficher_hex(grille, dico_conversion)
         grille = play_action(grille, dico_conversion, coup, BLEU)
+        aff.afficher_hex(grille, dico_conversion)
+        
 
         if final(grille, dico_conversion, direction):
             break
@@ -295,11 +300,12 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
         _, coup = alpha_beta_dodo(grille, dico_conversion,direction, ROUGE, depth, -INF, INF)
         print("Alpha BETA" ,coup)
         grille = play_action(grille, dico_conversion, coup, ROUGE)
+        aff.afficher_hex(grille, dico_conversion)
 
         if final(grille, dico_conversion, direction):
             break
             
-        aff.afficher_hex(grille, dico_conversion)
+        
     return final(grille, dico_conversion, direction)
 
 
