@@ -394,7 +394,7 @@ def memoize(fonction):
 
         val = fonction(grille,dico_conversion, player, dico_legaux, depth, alpha, beta) #! c'est bien grille et non grille_hashed
         cache[grille_hashed] = val
-        print("Cache : ", cache)
+        #print("Cache : ", cache)
         # ref = reflexion(grille, dico_conversion)
         # for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
         #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
@@ -427,8 +427,7 @@ def trier_actions(grid : GridTuple, dico_conversion : DictConv, liste_actions:Li
 
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-
-# @memoize
+#@memoize
 def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player, dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta) -> Tuple[Score, ActionGopher]:
 
     if depth == 0 or final(player_max, dico_legaux):
@@ -442,7 +441,8 @@ def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player,
             grid, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             # new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
             new_value, _ = alpha_beta(grid,dico_conversion, BLEU, dico_legaux, depth - 1, alpha, beta)
-            if new_value > best_value:
+            print("ROUGE",best_value)
+            if new_value >= best_value:
                 best_value = new_value
                 best_action = action
             alpha = max(alpha, new_value)
@@ -456,7 +456,8 @@ def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player,
             grid, dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
 
             new_value, _ = alpha_beta(grid,dico_conversion, ROUGE,dico_legaux, depth - 1, alpha, beta)
-            if new_value < min_value:
+            print("BLEU",best_value)
+            if new_value <= min_value:
                 min_value = new_value
                 best_action = action
             beta = min(beta, new_value)
@@ -502,10 +503,10 @@ def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
 
 
 #!test
-# boucle = 0
-# for i in tqdm(range(1)):
-#     if boucle_rd_ai(6, 5) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
-#         boucle +=1
-# print(boucle)
+boucle = 0
+for i in tqdm(range(1)):
+    if boucle_rd_ai(6, 5) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
+        boucle +=1
+print(boucle)
 
 
