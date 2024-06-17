@@ -7,6 +7,7 @@ from math import *
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import affichage as aff
+import copy 
 
 
 #! ---------------------- CONSTANTES ---------------------- !#
@@ -133,7 +134,7 @@ def voisins(dico_conversion : DictConv, pos:CellHex) -> List[CellHex]: #!OK
 
 #! ----------------------Fonctions lié aux actions legales ---------------------- !#
 
-def init_dico_legaux_gopher(grille:GridTuple, dico_conversion:DictConv) -> Tuple[TupleLegalGopher, TupleLegalGopher]: 
+def init_dico_legaux_gopher(dico_conversion:DictConv) -> Tuple[TupleLegalGopher, TupleLegalGopher]: 
     """Initialise le dictionnaire des coups légaux pour le gopher"""
     dico_legaux = {ROUGE:{}, BLEU:{}}
     for joueur in dico_legaux.keys():
@@ -228,7 +229,7 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
     """Boucle de jeu pour deux joueurs aléatoires"""
 
     grille, dico_conversion = init_grille_gopher(taille_grille)
-    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
+    dico_legaux = init_dico_legaux_gopher(dico_conversion)
     actions_possible = list(dico_conversion.keys())
     joueur = ROUGE
     action_debut = rd.choice(actions_possible)
@@ -256,18 +257,157 @@ def boucle_rd_rd(taille_grille : int) -> int: # ! boucle de jeu OK
 
 #! ---------------------- Fonctions d'évaluation ---------------------- !#
 
-def evaluation(dico_legaux: Tuple[TupleLegalGopher,TupleLegalGopher], joueur_actif : Player) -> int:
+def evaluation(dico_legaux: Tuple[TupleLegalGopher,TupleLegalGopher]) -> int:
     """Evalue une action"""
 
     score = score_final(dico_legaux)
     
-    if score == -INF and joueur_actif == ROUGE:
-        return score
-    elif score == INF and joueur_actif == BLEU:
-        return score
+    if score == -INF:
+        return -1000
+    elif score == INF:
+        return 1000
     else : 
         dico_legaux = {ROUGE : tuple_to_dict(dico_legaux[0]), BLEU : tuple_to_dict(dico_legaux[1])}
         return len([key for key in dico_legaux[ROUGE].keys() if dico_legaux[ROUGE][key]]) - len([key for key in dico_legaux[BLEU].keys() if dico_legaux[BLEU][key]])
+
+
+def base64(nombre:int, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,'):
+    """Conversion en base64."""
+    base64 = ''
+    if 0 <= nombre < len(alphabet):
+        return alphabet[nombre]
+    while nombre != 0:
+        nombre, i = divmod(nombre, len(alphabet))
+        base64 = alphabet[i] + base64
+    return base64
+
+
+def hashing(gameValueGrid:list[list[GameValue]]) -> str:
+    """Fonction de hashage d'une grille"""
+    hashage=""
+    for Dimension in gameValueGrid:
+        for GameValue in Dimension:
+            if GameValue == ROUGE: #1
+                hashage+="1"
+            elif GameValue == BLEU: #2
+                hashage+="2"
+            elif GameValue == EMPTY: #0
+                hashage+="0"
+            else: #cas NDEF
+                continue
+    # print(len(hashage))
+    # print(len(str(hex(int(hashage)))[2:]))
+    # print(len(str(base64(int(hashage)))))
+    return (str(base64(int(hashage))))
+
+
+#! ---------------------- Reflexions et rotations ---------------------- !#
+
+def rotation(grille : GridTuple, dico_conversion : DictConv) -> List[GridTuple]: #! OK
+    """effectue une rotation de 60° de la grille hexagonale, utile pour les symétries"""
+    taille_grille = len(grille)//2
+    rot_1 = tuple_to_list(init_grille_gopher(taille_grille)[0])
+    rot_2 = copy.deepcopy(rot_1)
+    rot_3 = copy.deepcopy(rot_1)
+    rot_4 = copy.deepcopy(rot_1)
+    rot_5 = copy.deepcopy(rot_1)
+
+
+    #!rotation 60°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    #!rotation 120°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_1[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    #!rotation 180°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_2[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+    #!rotation 240°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_3[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+    #!rotation 300°
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        new_cell = (cell[1], cell[1]-cell[0])
+        rot_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = rot_4[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    return [grille, liste_to_tuple(rot_1), liste_to_tuple(rot_2), liste_to_tuple(rot_3), liste_to_tuple(rot_4), liste_to_tuple(rot_5)]
+    
+
+def reflexion(grille : GridTuple, dico_conversion : DictConv) -> List[GridTuple]: #! OK
+    """effectue les 6 reflexions possible d'une grille donnée, utile pour les symétries"""
+    new_grille = tuple_to_list(grille)
+    taille_grille = len(new_grille)//2 
+    ref_1 = tuple_to_list(init_grille_gopher(taille_grille)[0])
+    ref_2 = copy.deepcopy(ref_1)
+    ref_3 = copy.deepcopy(ref_1)
+    ref_4 = copy.deepcopy(ref_1)
+    ref_5 = copy.deepcopy(ref_1)
+    ref_6 = copy.deepcopy(ref_1)
+
+    for cell in dico_conversion.keys(): #enumeration de tout les element de la matrice
+        #! symetrie axiale verticale
+        new_cell = (cell[1], cell[0])
+        ref_1[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+        #! symetrie axiale horizontale
+        new_cell = (-cell[1], -cell[0])
+        ref_2[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+        #! symetrie axe bleu
+        new_cell = (-cell[0], cell[1]-cell[0])
+        ref_3[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+        #! symetrie axe rouge
+        new_cell = (cell[0] - cell[1], -cell[1])
+        ref_4[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+         #! autre axe 
+        new_cell = (cell[0], cell[0]-cell[1])
+        ref_5[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+    
+        #! autre axe 
+        new_cell = (cell[1] - cell[0], cell[1])
+        ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
+
+    return [liste_to_tuple(ref_1), liste_to_tuple(ref_2), liste_to_tuple(ref_3), liste_to_tuple(ref_4), liste_to_tuple(ref_5), liste_to_tuple(ref_6)]
+
+
+
+
+def memoize(fonction):
+    """Memoize decorator pour la fonction alpha_beta"""
+    cache = {} # closure
+    print("Appel memoize") #!test
+    def g(grille : GridTuple,dico_conversion : DictConv, player : Player, dico_legaux : Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta):
+        grille_hashed = hashing(grille)
+        if grille_hashed in cache: 
+            # print("Appel memoize")
+            return cache[grille_hashed]
+
+        val = fonction(grille,dico_conversion, player, dico_legaux, depth, alpha, beta) #! c'est bien grille et non grille_hashed
+        cache[grille_hashed] = val
+        print("Cache : ", cache)
+        # ref = reflexion(grille, dico_conversion)
+        # for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
+        #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
+        #     for grille_ref_rot in grille_rot:
+        #         grille_ref_rot_hashed = hashing(grille_ref_rot)
+        #         if grille_ref_rot_hashed not in cache:
+        #             cache[grille_ref_rot_hashed] = val #! on fini par append le hash des 36 grilles dans le cache
+        return val
+    return g
+
+
+
+
 
 
 
@@ -279,20 +419,20 @@ def trier_actions(grid : GridTuple, dico_conversion : DictConv, liste_actions:Li
     if player_max == ROUGE:
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
-            liste_values.append(evaluation(dico_legaux, ROUGE))
+            liste_values.append(evaluation(dico_legaux))
     else :
         for action in liste_actions:
             _, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
-            liste_values.append(evaluation(dico_legaux, BLEU))
+            liste_values.append(evaluation(dico_legaux))
 
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
 
-
+# @memoize
 def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player, dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta) -> Tuple[Score, ActionGopher]:
 
     if depth == 0 or final(player_max, dico_legaux):
-        return evaluation(dico_legaux, player_max), None
+        return evaluation(dico_legaux), None
 
     if player_max == ROUGE:
         best_value = -INF
@@ -323,52 +463,49 @@ def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player,
             if beta <= alpha:
                 break  # Coupe alpha
         return min_value, best_action
-    
+
+
 
 def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
     """Boucle de jeu pour un joueur aléatoire et un joueur alpha beta"""
     grille, dico_conversion = init_grille_gopher(taille_grille)
-    dico_legaux = init_dico_legaux_gopher(grille, dico_conversion)
-    joueur = ROUGE
+    dico_legaux = init_dico_legaux_gopher(dico_conversion)
+    joueur = BLEU
     grille, dico_legaux = play_action(grille, dico_conversion, rd.choice(list(dico_conversion.keys())), joueur, dico_legaux)
 
     while True : 
         if joueur == ROUGE: joueur = BLEU 
         else : joueur = ROUGE #changment de joueur
 
-        print("Rouge", liste_coup_legaux(dico_legaux, ROUGE))
-        print("Bleu", liste_coup_legaux(dico_legaux, BLEU))
+        # print("Rouge", liste_coup_legaux(dico_legaux, ROUGE))
+        # print("Bleu", liste_coup_legaux(dico_legaux, BLEU))
 
         if joueur == ROUGE:
-            print("Rouge joue")
-            _, action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -INF, INF)
-            grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
-            if final(BLEU, dico_legaux): #verifie si le joueur BLEU a encore des coups légaux
-                break
-        else :
-            print("Bleu joue")
-            action = rd.choice(liste_coup_legaux(dico_legaux, joueur))
-            grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
             if final(ROUGE, dico_legaux):
                 break
-    # aff.afficher_hex(grille, dico_conversion= dico_conversion)
+            # print("Rouge joue")
+            _, action = alpha_beta(grille, dico_conversion, joueur, dico_legaux, depth, -INF, INF)
+            # print("Action : ", action)
+            # print("Evaluation : ", evaluation)
+            # print("Dico :", liste_coup_legaux(dico_legaux, joueur))
+            grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
+
+        else :
+            if final(BLEU, dico_legaux): #verifie si le joueur BLEU a encore des coups légaux
+                break
+            # print("Bleu joue")
+            action = rd.choice(liste_coup_legaux(dico_legaux, joueur))
+            grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
+
+    aff.afficher_hex(grille, dico_conversion= dico_conversion)
     return score_final(dico_legaux)
 
 
 #!test
 # boucle = 0
-# for i in tqdm(range(100)):
-#     result = boucle_rd_ai(5, 4)
-#     if result == INF:
+# for i in tqdm(range(1)):
+#     if boucle_rd_ai(6, 5) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
 #         boucle +=1
 # print(boucle)
-
-print(boucle_rd_ai(5, 9))
-
-# for i in tqdm(range(2, 10)):
-
-#     print(boucle_rd_ai(5, 1))
-
-# print(boucle_rd_ai(5, 1))
 
 

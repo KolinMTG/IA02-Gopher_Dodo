@@ -457,18 +457,7 @@ def reflexion(grille : Grid, dico_conversion : Dict) -> List[Grid]: #! OK
         #! autre axe 
         new_cell = (cell[1] - cell[0], cell[1])
         ref_6[dico_conversion[new_cell][0]][dico_conversion[new_cell][1]] = grille[dico_conversion[cell][0]][dico_conversion[cell][1]]
-    # print("reflexion 1")
-    # aff.afficher_hex(ref_1, dico_conversion)
-    # print("reflexion 2")
-    # aff.afficher_hex(ref_2, dico_conversion)
-    # print("reflexion 3")
-    # aff.afficher_hex(ref_3, dico_conversion)
-    # print("reflexion 4")
-    # aff.afficher_hex(ref_4, dico_conversion)
-    # print("reflexion 5")
-    # aff.afficher_hex(ref_5, dico_conversion)
-    # print("reflexion 6")
-    # aff.afficher_hex(ref_6, dico_conversion)
+
     return [liste_to_tuple(ref_1), liste_to_tuple(ref_2), liste_to_tuple(ref_3), liste_to_tuple(ref_4), liste_to_tuple(ref_5), liste_to_tuple(ref_6)]
 
 # #!test
