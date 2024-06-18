@@ -61,4 +61,3 @@ def afficher_hex(grid, dico_conversion):
     labels = create_label_list(dico_conversion)
     show_hex(coord, colors, labels)
 
-    
