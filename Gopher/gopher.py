@@ -388,20 +388,23 @@ def memoize(fonction):
     print("Appel memoize") #!test
     def g(grille : GridTuple,dico_conversion : DictConv, player : Player, dico_legaux : Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta):
         grille_hashed = hashing(grille)
-        if grille_hashed in cache: 
+        if grille_hashed in cache.keys(): 
             # print("Appel memoize")
             return cache[grille_hashed]
 
         val = fonction(grille,dico_conversion, player, dico_legaux, depth, alpha, beta) #! c'est bien grille et non grille_hashed
         if val[1]!=None :
+            #print(val)
             cache[grille_hashed] = val
-        # ref = reflexion(grille, dico_conversion)
-        # for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
-        #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
-        #     for grille_ref_rot in grille_rot:
-        #         grille_ref_rot_hashed = hashing(grille_ref_rot)
-        #         if grille_ref_rot_hashed not in cache:
-        #             cache[grille_ref_rot_hashed] = val #! on fini par append le hash des 36 grilles dans le cache
+            ref = reflexion(grille, dico_conversion)
+            for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
+                refhash = hashing(grille_ref)
+            #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
+            #     for grille_ref_rot in grille_rot:
+            #         grille_ref_rot_hashed = hashing(grille_ref_rot)
+            #         if grille_ref_rot_hashed not in cache:
+                if refhash not in cache.keys():
+                    cache[refhash] = val #! on fini par append le hash des 36 grilles dans le cache
         return val
     return g
 
@@ -506,8 +509,9 @@ def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
 nb=100
 boucle = 0
 for i in tqdm(range(nb)):
-    if boucle_rd_ai(6, 3) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
+    if boucle_rd_ai(6, 6) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
         boucle +=1
+        print(boucle)
 print(boucle/nb)
 
 
