@@ -3,14 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from typing import Union, List, Tuple, Dict
-import pprint
 import tkinter as tk
 import random as rd
 import multiprocessing as mp
 from numpy.typing import NDArray
 from math import *
 import itertools as it
-import copy
 import affichage as aff
 from tqdm import tqdm
 # import affichage as aff

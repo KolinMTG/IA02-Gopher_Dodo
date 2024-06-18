@@ -6,6 +6,7 @@ import dodo
 import gopher as goph #importation des elements du jeu 
 from typing import Dict,List, Any, Tuple, Union
 from gndclient import start, Action, Score, Player, State, Time, DODO_STR, GOPHER_STR
+import affichage as aff
 
 Environment = Dict[str, Any] #contients les elements necessaire a notre fonction min max. 
 # Player = int #Joueur : donc ROUGE ou BLEU
@@ -37,6 +38,7 @@ NDEF = -1 #case non définie
 #     "game" : "dodo"(const),
 #     "grille" : GridDodo,
 #     "dico_conversion" : Dict_Conv,
+#     "direction" : DirectionJeu,
 #     "joueur" : Player,
 #     "depth" : int
 # }
@@ -55,15 +57,16 @@ print("Client started")
 
 
 def initialize(game: str, state: State, player: Player, hex_size: int, total_time: Time):
+    print(game)
     """initialise l'environement en fonction du jeu choisi"""
     print("Initialisation de l'environement")
     environement = {} #environement est un dictionnaire qui contient les elements necessaire à notre programme pour bien jouer au jeu.
-    
+
     #! DODO
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
-        environement["grille"], environement["dico_conversion"] = dodo.init_grille_dodo(hex_size-1)
+        environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo(hex_size-1)
         environement["joueur"] = player
         environement["depth"] = 3
         print("Initialisation terminé pour le jeu Dodo")
@@ -93,22 +96,30 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
     """fonction permettant de recuperer le coup joué par l'adversaire et de le jouer afin de mettre a jour la grille
     et les dico legaux"""
 
+    print("Execution de update_env")
+    aff.afficher_hex(env["grille"], env["dico_conversion"])
     #! DODO
     if env["game"] == "dodo":
         #mise a jour de l'environement pour dodo
         depart = (0,0)
         arrivee = (0,0)
         for element in state : 
+            print("element", element)
+            print("grille value", env["grille"][env["dico_conversion"][element[0]][0]][env["dico_conversion"][element[0]][1]])
             case = element[0]
             value = element[1]
             if value != env["grille"][env["dico_conversion"][case][0]][env["dico_conversion"][case][1]]:
+                print("valeur changée")
                 if value == EMPTY: #si la case qui a changé est vide, c'est que c'est la case de depart de l'aderseaire
                     depart = env["dico_conversion"][case]
+                    print("depart", depart)
                 else: #sinon elle contient la valeur du joueur adverse et c'est la case d'arrivée
                     arrivee = env["dico_conversion"][case]
+                    print("arrivee", arrivee)
         #mise a jour de l'environement
         env["grille"] = dodo.play_action(env["grille"],env["dico_conversion"] ,(depart, arrivee), env["joueur"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur
+        print(env)
         return env
 
     #! GOPHER
