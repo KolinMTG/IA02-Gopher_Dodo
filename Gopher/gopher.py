@@ -388,20 +388,23 @@ def memoize(fonction):
     print("Appel memoize") #!test
     def g(grille : GridTuple,dico_conversion : DictConv, player : Player, dico_legaux : Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta):
         grille_hashed = hashing(grille)
-        if grille_hashed in cache: 
+        if grille_hashed in cache.keys(): 
             # print("Appel memoize")
             return cache[grille_hashed]
 
         val = fonction(grille,dico_conversion, player, dico_legaux, depth, alpha, beta) #! c'est bien grille et non grille_hashed
-        cache[grille_hashed] = val
-        #print("Cache : ", cache)
-        # ref = reflexion(grille, dico_conversion)
-        # for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
-        #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
-        #     for grille_ref_rot in grille_rot:
-        #         grille_ref_rot_hashed = hashing(grille_ref_rot)
-        #         if grille_ref_rot_hashed not in cache:
-        #             cache[grille_ref_rot_hashed] = val #! on fini par append le hash des 36 grilles dans le cache
+        if val[1]!=None :
+            #print(val)
+            cache[grille_hashed] = val
+            ref = reflexion(grille, dico_conversion)
+            for grille_ref in ref: #! on fait 6 reflexions de la grille de depart
+                refhash = hashing(grille_ref)
+            #     grille_rot = rotation(grille_ref, dico_conversion) #! sur chacunes des relfexions on fait 6 rotations
+            #     for grille_ref_rot in grille_rot:
+            #         grille_ref_rot_hashed = hashing(grille_ref_rot)
+            #         if grille_ref_rot_hashed not in cache:
+                if refhash not in cache.keys():
+                    cache[refhash] = val #! on fini par append le hash des 36 grilles dans le cache
         return val
     return g
 
@@ -427,7 +430,7 @@ def trier_actions(grid : GridTuple, dico_conversion : DictConv, liste_actions:Li
 
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-#@memoize
+@memoize
 def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player, dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher], depth, alpha, beta) -> Tuple[Score, ActionGopher]:
 
     if depth == 0 or final(player_max, dico_legaux):
@@ -441,7 +444,7 @@ def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player,
             grid, dico_legaux = play_action(grid, dico_conversion, action, ROUGE, dico_legaux)
             # new_value, _ = alpha_beta(new_grid,dico_conversion, BLEU, new_dico_legaux, depth - 1, alpha, beta)
             new_value, _ = alpha_beta(grid,dico_conversion, BLEU, dico_legaux, depth - 1, alpha, beta)
-            print("ROUGE",best_value)
+            #print("ROUGE",best_value)
             if new_value >= best_value:
                 best_value = new_value
                 best_action = action
@@ -456,7 +459,7 @@ def alpha_beta(grid : GridTuple,dico_conversion : DictConv, player_max : Player,
             grid, dico_legaux = play_action(grid, dico_conversion, action, BLEU, dico_legaux)
 
             new_value, _ = alpha_beta(grid,dico_conversion, ROUGE,dico_legaux, depth - 1, alpha, beta)
-            print("BLEU",best_value)
+            #print("BLEU",best_value)
             if new_value <= min_value:
                 min_value = new_value
                 best_action = action
@@ -498,7 +501,7 @@ def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
             action = rd.choice(liste_coup_legaux(dico_legaux, joueur))
             grille, dico_legaux = play_action(grille, dico_conversion, action, joueur, dico_legaux)
 
-    aff.afficher_hex(grille, dico_conversion= dico_conversion)
+    #aff.afficher_hex(grille, dico_conversion= dico_conversion)
     return score_final(dico_legaux)
 
 
