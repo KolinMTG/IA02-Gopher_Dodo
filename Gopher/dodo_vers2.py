@@ -338,7 +338,7 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
         
 
         if final(grille, dico_conversion, direction):
-            aff.afficher_hex(grille, dico_conversion)
+            #aff.afficher_hex(grille, dico_conversion)
             break
         
         _, coup = alpha_beta_dodo(grille, dico_conversion,direction, ROUGE, depth, -INF, INF)
@@ -348,7 +348,7 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
         
 
         if final(grille, dico_conversion, direction):
-            aff.afficher_hex(grille, dico_conversion)
+            #aff.afficher_hex(grille, dico_conversion)
             break
             
         
@@ -381,7 +381,7 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 #         return best_value, best_action
 
 # #!test
-nb=5
+nb=100
 test=[]
 boucle=0
 for i in tqdm(range(nb)):
