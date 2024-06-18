@@ -20,6 +20,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     environement = {} #environement est un dictionnaire qui contient les elements necessaire à notre programme pour bien jouer au jeu.
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
+        environement["game"] = "dodo"
         environement["grille"], environement["dico_conversion"] = dodo.init_grille_dodo(hex_size-1)
         environement["dico_legaux"] = dodo.init_legal_moves(environement["grille"], player)
         environement["joueur"] = player
@@ -27,9 +28,12 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 
     if game == "gopher" or game == "Gopher" or game == "GOPHER":
         #initialisation de l'environement pour gopher
+        environement["game"] = "gopher"
         environement["grille"], environement["dico_conversion"] = goph.init_grille_gopher(hex_size-1)
         environement["dico_legaux"] = goph.init_legal_moves(environement["grille"], player)
         environement["joueur"] = player
+        environement["is_odd"] = True if hex_size % 2 == 1 else False #booleen qui determine si la taille de la grille est pair ou impaire
+        #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
         return environement
 
     print("Erreur: Le jeu n'existe pas")
@@ -46,19 +50,44 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 #     )
 #     return {}
 
+# def update_env(env: Environment, state: State, player: Player):
+
+
 
 def strategy_brain(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
-    print("New state ", state)
-    print("Time remaining ", time_left)
-    print("What's your play ? ", end="")
-    s = input()
+    if env["game"] == "dodo":
+        #strategie dodo
+        
+
+        action = dodo.alpha_beta_dodo(env["grille"], env["dico_legaux"], env["joueur"], 3, -dodo.INF, dodo.INF)
+        
+    elif env["game"] == "gopher":
+        if env["is_odd"]:
+            #strategie gopher pour les grilles impaire >= 5
+
+        else:
+            #strategie gopher pour les grilles paire ou les grilles de taille < 5
+
+    else:
+        print("Erreur: Le jeu n'existe pas")
+        return (env, None)
     
-    t = ast.literal_eval(s) 
-    env = {"info": 1}
-    print(env, t)
-    return (env, t) #! renvoiyer ici l'environemenet et l'action a effectuer 
+    return (env, t) #! renvoiyer ici l'environemenet et l'action a effectuer
+
+# def strategy_brain(
+#     env: Environment, state: State, player: Player, time_left: Time
+# ) -> tuple[Environment, Action]:
+#     print("New state ", state)
+#     print("Time remaining ", time_left)
+#     print("What's your play ? ", end="")
+#     s = input()
+    
+#     t = ast.literal_eval(s) 
+#     env = {"info": 1}
+#     print(env, t)
+#     return (env, t) #! renvoiyer ici l'environemenet et l'action a effectuer 
 
 
 def final_result(state: State, score: Score, player: Player):
