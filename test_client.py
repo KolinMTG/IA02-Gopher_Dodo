@@ -4,13 +4,27 @@ import ast
 import argparse
 import dodo
 import gopher as goph #importation des elements du jeu 
-from typing import Dict, Any
+from typing import Dict,List, Any, Tuple, Union
 from gndclient import start, Action, Score, Player, State, Time, DODO_STR, GOPHER_STR
 
 Environment = Dict[str, Any] #contients les elements necessaire a notre fonction min max. 
+Player = int #Joueur : donc ROUGE ou BLEU
+GameValue = int #valeur d'une case : donc NDEF, EMPTY, ROUGE, BLEU
+
+
+Cell = Tuple[int, int] #Coordonnées d'une case
+CellMat = Cell  #Coordonnées d'une case dans la matrice
+CellHex = Cell #Coordonnées d'une case dans l'affichage hexagonal a fournir au serveur
+
+GridTuple = Tuple[Tuple[GameValue]] #La grille de jeu, est un tableau numpy 2D de GameValue
+GridList = List[List[GameValue]] #La grille de jeu, est un tableau numpy 2D de GameValue
+ActionGopher = Cell
+ActionDodo = tuple[Cell, Cell] # case de départ -> case d'arrivée
+Action = Union[ActionGopher, ActionDodo]
 
 #Grid = Union[GridGopher, GridDodo]
 #Environement = Dict[grille : Grid, dico_conversion : Dict_Conv, dico_legaux : ]
+
 
 EMPTY = 0
 ROUGE = 1
@@ -67,7 +81,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 
 
 
-def update_env(env: Environment, state:State) -> Environment:
+def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
     """fonction permettant de recuperer le coup joué par l'adversaire et de le jouer afin de mettre a jour la grille
     et les dico legaux"""
 
@@ -111,25 +125,27 @@ def strategy_brain(
 ) -> tuple[Environment, Action]:
     
     env = update_env(env, state) #update l'environement avec le coup joué par l'aderseaire
+    #fait office de tour pour l'adversaire
+
+    #! DODO
     if env["game"] == "dodo":
-        #strategie dodo
+        action = dodo.alpha_beta_dodo(env["grille"], env["conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
+        env["grille"] = dodo.play_action(env["grille"], env["dico_conversion"], action, env["joueur"])
+        env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur, on a fini de jouer c'est au tour de l'adversaire
+        return env, action
         
 
-        action = dodo.alpha_beta_dodo(env["grille"], env["dico_legaux"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
-        
-
-        
+    #! GOPHER
     elif env["game"] == "gopher":
         if env["is_odd"]:
             #strategie gopher pour les grilles impaire >= 5
-            coup_bleu =
             action = goph.strategie_impaire(coup_bleu,env["grille"], env["dico_conversion"])
 
 
         else:
-            #strategie gopher pour les grilles paire ou les grilles de taille < 5
-            action = goph.alpha_beta_gopher(env["grille"], env["dico_legaux"], env["joueur"], env["depth"], -goph.INF, goph.INF)
-            env["grille"], env["dico_legaux"] = goph.play_gopher(env["grille"], action, env["dico_legaux"], env["joueur"])
+            action = goph.alpha_beta(env["grille"],env["dico_conversion"], env["joueur"],env["dico_legaux"], env["depth"], -goph.INF, goph.INF)
+            env["grille"], env["dico_legaux"] = goph.play_action(env["grille"], env["dico_conversion"], action, env["joueur"], env["dico_legaux"])
+            env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changement de joueur, on a fini de jouer c'est au tour de l'adversaire
             return env, action
 
 
@@ -154,6 +170,7 @@ def strategy_brain(
 
 
 def final_result(state: State, score: Score, player: Player):
+    
     print(f"Ending: {player} wins with a score of {score}") 
 
 
