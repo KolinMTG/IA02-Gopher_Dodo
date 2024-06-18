@@ -51,6 +51,7 @@ NDEF = -1 #case non définie
 #     "is_odd" : bool,
 #     "depth" : int
 # }
+print("Client started")
 
 
 def initialize(game: str, state: State, player: Player, hex_size: int, total_time: Time):
