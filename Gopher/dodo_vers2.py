@@ -267,7 +267,8 @@ def memoize(fonction):
             # print("Appel memoize")
             return cache[grille_hashed]
         val = fonction(grid,dico_conversion,direction, player_max, depth, alpha, beta) #! c'est bien grille et non grille_hashed
-        cache[grille_hashed] = val
+        if val[1] != None:
+            cache[grille_hashed] = val
         return val
     return g
 
@@ -283,7 +284,7 @@ def trier_actions(grid, dico_conversion,direction, liste_actions:List[ActionGoph
     #print(liste_values,liste_actions)
     return [x for _, x in sorted(zip(liste_values, liste_actions))]
 
-#@memoize
+@memoize
 def alpha_beta_dodo(grid : Grid,dico_conversion,direction, player_max : Player, depth, alpha, beta) -> Tuple[Score, ActionGopher]:
 
     if depth == 0 or final(grid, dico_conversion, direction):
@@ -385,7 +386,7 @@ nb=100
 test=[]
 boucle=0
 for i in tqdm(range(nb)):
-    test.append(boucle_rd_alpha_beta(3, 3))
+    test.append(boucle_rd_alpha_beta(3, 6))
     if test[i] == 1:
         boucle+=1
 print(boucle/nb)
