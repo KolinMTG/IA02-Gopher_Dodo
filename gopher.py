@@ -557,11 +557,11 @@ def boucle_rd_strategie_impaire(taille_grille : int) -> int :
     return score_final(dico_legaux)
 
 #!test
-compteur = 0
-for i in tqdm(range(1000)):
-    if boucle_rd_strategie_impaire(7) == -INF:
-        compteur +=1
-print(compteur)
+# compteur = 0
+# for i in tqdm(range(1000)):
+#     if boucle_rd_strategie_impaire(7) == -INF:
+#         compteur +=1
+# print(compteur)
 
 
 

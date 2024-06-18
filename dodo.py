@@ -382,14 +382,14 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
 #         return best_value, best_action
 
 # #!test
-nb=100
-test=[]
-boucle=0
-for i in tqdm(range(nb)):
-    test.append(boucle_rd_alpha_beta(3, 6))
-    if test[i] == 1:
-        boucle+=1
-print(boucle/nb)
+# nb=100
+# test=[]
+# boucle=0
+# for i in tqdm(range(nb)):
+#     test.append(boucle_rd_alpha_beta(3, 6))
+#     if test[i] == 1:
+#         boucle+=1
+# print(boucle/nb)
 
 
 
