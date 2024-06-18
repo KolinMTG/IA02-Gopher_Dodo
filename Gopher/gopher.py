@@ -509,12 +509,58 @@ def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
 #         boucle +=1
 # print(boucle)
 
-def strategie_impaire():
+def strategie_impaire(coup_bleu : ActionGopher,grille : GridTuple, dico_conversion : DictConv) -> ActionGopher:
     """renvoie les meilleurs coup pour win les tailles impaire superieurs à 5"""
 
-    grille, dico_conv = init_grille_gopher(4)
-    init_dico_legaux_gopher
-    aff.afficher_hex(grille, dico_conv)
+    voisins_trouve = voisins(dico_conversion, coup_bleu)
+    for coup in voisins_trouve:
+        if grille[dico_conversion[coup][0]][dico_conversion[coup][1]] == ROUGE:
+            vector = (coup_bleu[0] - coup[0], coup_bleu[1] - coup[1])
+            return (coup_bleu[0] + vector[0], coup_bleu[1] + vector[1])
+    return None
 
-strategie_impaire()
+
+def boucle_rd_strategie_impaire(taille_grille : int) -> int :
+    """Boucle de jeu pour un joueur aléatoire et un joueur alpha beta"""
+    assert taille_grille % 2 == 1, "La taille de la grille doit être impaire"
+    grille, dico_conversion = init_grille_gopher(taille_grille-1)
+    dico_legaux = init_dico_legaux_gopher(dico_conversion)
+    joueur = ROUGE
+    grille, dico_legaux = play_action(grille, dico_conversion,(0,0), joueur, dico_legaux)
+    action_bleu = (0,0)
+    while True : 
+        
+        if joueur == ROUGE: joueur = BLEU 
+        else : joueur = ROUGE #changment de joueur
+
+        # print("Rouge", liste_coup_legaux(dico_legaux, ROUGE))
+        # print("Bleu", liste_coup_legaux(dico_legaux, BLEU))
+
+        if joueur == ROUGE:
+            if final(ROUGE, dico_legaux):
+                break
+
+            action_rouge = strategie_impaire(action_bleu, grille, dico_conversion)
+            grille, dico_legaux = play_action(grille, dico_conversion, action_rouge, joueur, dico_legaux)
+
+        else :
+            if final(BLEU, dico_legaux): #verifie si le joueur BLEU a encore des coups légaux
+                break
+            # print("Bleu joue")
+            action_bleu = rd.choice(liste_coup_legaux(dico_legaux, joueur))
+            grille, dico_legaux = play_action(grille, dico_conversion, action_bleu, joueur, dico_legaux)
+
+    # aff.afficher_hex(grille, dico_conversion= dico_conversion)
+    return score_final(dico_legaux)
+
+#!test
+compteur = 0
+for i in tqdm(range(1000)):
+    if boucle_rd_strategie_impaire(7) == -INF:
+        compteur +=1
+print(compteur)
+
+
+
+
 
