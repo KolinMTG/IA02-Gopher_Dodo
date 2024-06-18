@@ -502,10 +502,8 @@ def boucle_rd_ai(taille_grille : int, depth : int) -> int: # ! boucle de jeu OK
 
 
 #!test
-# boucle = 0
-# for i in tqdm(range(1)):
-#     if boucle_rd_ai(6, 5) == INF: #6/3 3.59 sec/it, 6/5 17.8 sec/it
-#         boucle +=1
-# print(boucle)
+boucle = 0
+print(boucle_rd_ai(6, 3))
+
 
 
