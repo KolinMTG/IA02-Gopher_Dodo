@@ -313,7 +313,7 @@ def score_final(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> int: 
 #! ---------------------- Boucle de jeu RD_RD ---------------------- !#
 
 
-def boucle_rd_rd(taille_grille: int) -> int:  # ! boucle de jeu OK
+def boucle_rd_rd(taille_grille: int) -> float:  # ! boucle de jeu OK
     """Boucle de jeu pour deux joueurs aléatoires"""
 
     grille, dico_conversion = init_grille_gopher(taille_grille)
@@ -351,7 +351,7 @@ def boucle_rd_rd(taille_grille: int) -> int:  # ! boucle de jeu OK
 #! ---------------------- Fonctions d'évaluation ---------------------- !#
 
 
-def evaluation(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> int:
+def evaluation(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> float:
     """Evalue une action"""
 
     score = score_final(dico_legaux)
@@ -384,7 +384,7 @@ def base64(
     return base64_result
 
 
-def hashing(game_val_grid: list[list[GameValue]]) -> str:
+def hashing(game_val_grid: GridTuple) -> str:
     """Fonction de hashage d'une grille"""
     hashage = ""
     for dimension in game_val_grid:
@@ -647,7 +647,7 @@ def alpha_beta(
     return min_value, best_action
 
 
-def boucle_rd_ai(taille_grille: int, depth: int) -> int:  # ! boucle de jeu OK
+def boucle_rd_ai(taille_grille: int, depth: int) -> float:  # ! boucle de jeu OK
     """Boucle de jeu pour un joueur aléatoire et un joueur alpha beta"""
     grille, dico_conversion = init_grille_gopher(taille_grille)
     dico_legaux = init_dico_legaux_gopher(dico_conversion)
@@ -719,7 +719,7 @@ def strategie_impaire(
     return None
 
 
-def boucle_rd_strategie_impaire(taille_grille: int) -> int:
+def boucle_rd_strategie_impaire(taille_grille: int) -> float:
     """Boucle de jeu pour un joueur aléatoire et un joueur alpha beta"""
     assert taille_grille % 2 == 1, "La taille de la grille doit être impaire"
     grille, dico_conversion = init_grille_gopher(taille_grille - 1)
