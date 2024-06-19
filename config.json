@@ -7,5 +7,29 @@
     "GridPossibleSizes": [
         4,
         6
+    ],
+    "Tournaments": [
+        {
+            "Name": "Warm Up",
+            "Param": {
+                "Game": 1,
+                "GridSize": 5,
+                "RedPlayer": "",
+                "BluePlayer": ""
+            },
+            "WarmUp": true,
+            "WarmUpRounds": 2
+        },
+        {
+            "Name": "DODO 5",
+            "Param": {
+                "Game": 1,
+                "GridSize": 5,
+                "RedPlayer": "",
+                "BluePlayer": ""
+            },
+            "WarmUp": false,
+            "WarmUpRounds": 0
+        }
     ]
 }
