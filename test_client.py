@@ -67,7 +67,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
         environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo(hex_size-1)
-        environement["joueur"] = player
+        environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         environement["depth"] = 3
         print("Initialisation terminé pour le jeu Dodo")
         print("Environement actuel : ", environement)
@@ -79,7 +79,8 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         environement["game"] = "gopher"
         environement["grille"], environement["dico_conversion"] = goph.init_grille_gopher(hex_size-1)
         environement["dico_legaux"] = goph.init_dico_legaux_gopher(environement["dico_conversion"])
-        environement["joueur"] = player
+        environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
+        print("initialisation du joueur", player)
         environement["is_odd"] = True if hex_size % 2 == 1 else False #booleen qui determine si la taille de la grille est pair ou impaire
         environement["depth"] = 3 
         #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
@@ -120,35 +121,39 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
         env["grille"] = dodo.play_action(env["grille"],env["dico_conversion"] ,(depart, arrivee), env["joueur"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur
         print(env)
-        return env
+        return env, (depart, arrivee)
 
     #! GOPHER
-    if env["game"] == "gopher":
+    if env["game"] == "gopher": #!semble ok pour la partie Gopher, problème pour Dodo
         for element in state:
             case = element[0]
             value = element[1]
             if value != env["grille"][env["dico_conversion"][case][0]][env["dico_conversion"][case][1]]: #si la valeur est differente de celle de la grille 
                 #c'est que c'est une valeur qui a changé, donc la valeur que l'adversaire a joué. 
                 action_adverse = case
+                print("action jouée par l'adversaire", action_adverse)
+                break #il n'y a qu'une seul action qui est joué par l'adversaire de toute façon
         #mise a jours de l'environement
         env["grille"], env["dico_legaux"] = goph.play_action(env["grille"], env["dico_conversion"],action_adverse, env["joueur"], env["dico_legaux"])
-        env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU
+        env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur 
+        # print("New Player", env["joueur"])
+        # print("New grid", env["grille"])
+        # print("New ,dico _legaux", env["dico_legaux"])
         return env, action_adverse
 
     print("Erreur: Le jeu n'existe pas")
     return {}
 
 
-def strategy_brain(
-    env: Environment, state: State, player: Player, time_left: Time
-) -> tuple[Environment, Action]:
+def strategy_brain(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
     
-    env = update_env(env, state) #update l'environement avec le coup joué par l'aderseaire
+    env, _ = update_env(env, state) #update l'environement avec le coup joué par l'aderseaire
     #fait office de tour pour l'adversaire
 
     #! DODO
     if env["game"] == "dodo":
-        action = dodo.alpha_beta_dodo(env["grille"], env["conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
+        print("strategy_brain::On joue a DODO")
+        _,action = dodo.alpha_beta_dodo(env["grille"], env["conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
         env["grille"] = dodo.play_action(env["grille"], env["dico_conversion"], action, env["joueur"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur, on a fini de jouer c'est au tour de l'adversaire
         return env, action
@@ -156,7 +161,9 @@ def strategy_brain(
 
     #! GOPHER
     elif env["game"] == "gopher":
+        print("strategy_brain::On joue a GOPHER")
         if env["is_odd"]:
+            print("la grille est de taille impaire >=5")
             #strategie gopher pour les grilles impaire >= 5 et joueur = rouge
             env, coup_bleu = update_env(env, state)
             action = goph.strategie_impaire(coup_bleu,env["grille"], env["dico_conversion"])
@@ -166,7 +173,8 @@ def strategy_brain(
 
 
         else:
-            action = goph.alpha_beta(env["grille"],env["dico_conversion"], env["joueur"],env["dico_legaux"], env["depth"], -goph.INF, goph.INF)
+            print("la grille est de taille pair, ou inferieur à 5")
+            _,action = goph.alpha_beta(env["grille"],env["dico_conversion"], env["joueur"],env["dico_legaux"], env["depth"], -goph.INF, goph.INF)
             env["grille"], env["dico_legaux"] = goph.play_action(env["grille"], env["dico_conversion"], action, env["joueur"], env["dico_legaux"])
             env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changement de joueur, on a fini de jouer c'est au tour de l'adversaire
             return env, action
