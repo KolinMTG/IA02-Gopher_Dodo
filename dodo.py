@@ -1,3 +1,7 @@
+"""auteur : Bastien CUVILLIER,Colin MANYRI, 
+date : 19/06/2024, version : 1.0
+fichier contenant les fonctions pour le jeu gopher"""
+
 from token import ISNONTERMINAL
 import numpy as np
 import matplotlib.pyplot as plt

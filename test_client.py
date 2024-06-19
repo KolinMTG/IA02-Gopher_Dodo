@@ -82,7 +82,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         print("initialisation du joueur", player)
         environement["is_odd"] = True if hex_size % 2 == 1 else False #booleen qui determine si la taille de la grille est pair ou impaire
-        environement["depth"] = 3 
+        environement["depth"] = 6
         #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
         print("Initialisation terminé pour le jeu Gopher de taille ", hex_size)
         print("Environement actuel : ", environement)
@@ -97,26 +97,37 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
     """fonction permettant de recuperer le coup joué par l'adversaire et de le jouer afin de mettre a jour la grille
     et les dico legaux"""
 
-    print("Execution de update_env")
-    aff.afficher_hex(env["grille"], env["dico_conversion"])
+    # print("Execution de update_env")
+    # aff.afficher_hex(env["grille"], env["dico_conversion"])
     #! DODO
     if env["game"] == "dodo":
+        aff.afficher_hex(env["grille"], env["dico_conversion"])
+        print(state)
+
         #mise a jour de l'environement pour dodo
         depart = (0,0)
         arrivee = (0,0)
+        c_arr = 0 #!compteur test
+        c_dep = 0 #!compteur test
         for element in state : 
-            print("element", element)
-            print("grille value", env["grille"][env["dico_conversion"][element[0]][0]][env["dico_conversion"][element[0]][1]])
+            # print("element", element)
+            # print("grille value", env["grille"][env["dico_conversion"][element[0]][0]][env["dico_conversion"][element[0]][1]])
             case = element[0]
             value = element[1]
             if value != env["grille"][env["dico_conversion"][case][0]][env["dico_conversion"][case][1]]:
-                print("valeur changée")
-                if value == EMPTY: #si la case qui a changé est vide, c'est que c'est la case de depart de l'aderseaire
+
+
+                # print("valeur changée")
+                if value == EMPTY: #si la case qui a changé est vide, c'est que c'est la case de depart de l'adverseaire
                     depart = env["dico_conversion"][case]
+                    c_dep += 1
                     print("depart", depart)
-                else: #sinon elle contient la valeur du joueur adverse et c'est la case d'arrivée
+                elif value == env["joueur"]: #sinon elle contient la valeur du joueur adverse et c'est la case d'arrivée
                     arrivee = env["dico_conversion"][case]
+                    c_arr += 1
                     print("arrivee", arrivee)
+        print("c_dep", c_dep)
+        print("c_arr", c_arr)
         #mise a jour de l'environement
         env["grille"] = dodo.play_action(env["grille"],env["dico_conversion"] ,(depart, arrivee), env["joueur"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur
@@ -146,7 +157,7 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
 
 
 def strategy_brain(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
-    
+    print("temps restant", time_left)
     env, _ = update_env(env, state) #update l'environement avec le coup joué par l'aderseaire
     #fait office de tour pour l'adversaire
 
