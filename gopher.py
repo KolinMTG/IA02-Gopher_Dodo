@@ -4,7 +4,7 @@ fichier contenant les fonctions pour le jeu gopher"""
 import random as rd
 from math import inf
 import copy
-from typing import Union, List, Tuple, Dict
+from typing import Union, List, Tuple, Dict, Optional
 import numpy as np
 from tqdm import tqdm
 import affichage as aff
@@ -47,7 +47,7 @@ TupleLegalGopher = Tuple[Tuple[ActionDodo, bool]]  # Tuple des coups légaux
 
 
 State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
-Score = int
+Score = float
 Time = int
 
 # //! ----------------------Fonction de conversions ---------------------- !#
@@ -351,8 +351,8 @@ def boucle_rd_rd(taille_grille: int) -> float:  # ! boucle de jeu OK
 #! ---------------------- Fonctions d'évaluation ---------------------- !#
 
 
-def evaluation(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> float:
-    """Evalue une action"""
+def evaluation(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> Score:
+    """Evalue le score d'une action"""
 
     score = score_final(dico_legaux)
 
@@ -588,7 +588,7 @@ def alpha_beta(
     depth,
     alpha,
     beta,
-) -> Tuple[Score, ActionGopher]:
+) -> Tuple[Score, Optional[ActionGopher]]:
     """fonction alpha beta pour le jeu gopher"""
 
     if depth == 0 or final(player_max, dico_legaux):
@@ -716,7 +716,7 @@ def strategie_impaire(
         if grille[dico_conversion[coup][0]][dico_conversion[coup][1]] == ROUGE:
             vector = (coup_bleu[0] - coup[0], coup_bleu[1] - coup[1])
             return (coup_bleu[0] + vector[0], coup_bleu[1] + vector[1])
-    return None
+    raise ValueError("strategie_impaire : pas de coup trouvé")
 
 
 def boucle_rd_strategie_impaire(taille_grille: int) -> float:
