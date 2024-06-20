@@ -105,37 +105,24 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
     # aff.afficher_hex(env["grille"], env["dico_conversion"])
     #! DODO
     if env["game"] == "dodo":
-        aff.afficher_hex(env["grille"], env["dico_conversion"])
-        print(state)
 
         #mise a jour de l'environement pour dodo
         depart = (0,0)
         arrivee = (0,0)
-        c_arr = 0 #!compteur test
-        c_dep = 0 #!compteur test
         for element in state : 
-            # print("element", element)
-            # print("grille value", env["grille"][env["dico_conversion"][element[0]][0]][env["dico_conversion"][element[0]][1]])
             case = element[0]
             value = element[1]
             if value != env["grille"][env["dico_conversion"][case][0]][env["dico_conversion"][case][1]]:
 
-
-                # print("valeur changée")
                 if value == EMPTY: #si la case qui a changé est vide, c'est que c'est la case de depart de l'adverseaire
                     depart = env["dico_conversion"][case]
-                    c_dep += 1
-                    print("depart", depart)
                 elif value == env["joueur"]: #sinon elle contient la valeur du joueur adverse et c'est la case d'arrivée
                     arrivee = env["dico_conversion"][case]
-                    c_arr += 1
-                    print("arrivee", arrivee)
-        print("c_dep", c_dep)
-        print("c_arr", c_arr)
         #mise a jour de l'environement
         env["grille"] = dodo.play_action(env["grille"],env["dico_conversion"] ,(depart, arrivee), env["joueur"])
+        print("action jouée : ", (depart, arrivee))
+
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur
-        print(env)
         return env, (depart, arrivee)
 
     #! GOPHER
@@ -168,9 +155,13 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
     #! DODO
     if env["game"] == "dodo":
         print("strategy_brain::On joue a DODO")
+        env, _ = update_env(env, state)
         _,action = dodo.alpha_beta_dodo(env["grille"], env["dico_conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
+        print("action jouée : ", action)
         env["grille"] = dodo.play_action(env["grille"], env["dico_conversion"], action, env["joueur"])
+        print("grille apres action", env["grille"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur, on a fini de jouer c'est au tour de l'adversaire
+        print("nouveau joueur", env["joueur"])
         return env, action
         
 
