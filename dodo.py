@@ -2,7 +2,7 @@
 date : 19/06/2024, version : 1.32
 fichier contenant les fonctions pour le jeu dodo"""
 
-from typing import Union, List, Tuple, Dict
+from typing import Union, List, Tuple, Dict,Any
 import random as rd
 from math import inf
 from numpy.typing import NDArray
@@ -12,7 +12,7 @@ import numpy as np
 
 # import affichage as aff
 # Types de base utilisés par l'arbitre
-Grid = NDArray  # Grille de jeu (tableau 2D de cases)
+Grid = tuple[tuple[Any,...],...]  # Grille de jeu (tableau 2D de cases)
 # chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
 GameValue = int  # Valeur d'une case (0, 1 ou 2)
 Cell = Tuple[int, int]
@@ -65,7 +65,7 @@ def liste_to_tuple(lis: List) -> Tuple:
 # initialisation de la grille en suivant les règle
 # du jeu dodo pour n'importe quelles tailles de grilles
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
-def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
+def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict[tuple[int,int],tuple[int,int]], DirectionJeu]:  #!OK
     """Initialise la grille de jeu avec les pions au bon endroit.
     Et initialisation du dico de conversion."""
     taille_array = 2 * taille_grille + 1
@@ -355,7 +355,7 @@ def base64(
     return b64
 
 
-def hashing(game_value_grid: list[list[GameValue]]) -> str:
+def hashing(game_value_grid: Grid) -> str:
     """Fonction de hashage d'une grille"""
     hashage = ""
     for dimension in game_value_grid:
@@ -396,9 +396,9 @@ def trier_actions(
     grid,
     dico_conversion,
     direction,
-    liste_actions: List[ActionGopher],
+    liste_actions: List[ActionDodo],
     player_max: Player,
-) -> List[ActionGopher]:
+) -> List[ActionDodo]:
     """Trie les actions en fonction du joueur"""
     liste_values = []
     if player_max == ROUGE:
@@ -414,7 +414,7 @@ def trier_actions(
 @memoize
 def alpha_beta_dodo(
     grid: Grid, dico_conversion, direction, player_max: Player, depth, alpha, beta
-) -> Tuple[Score, ActionGopher]:
+) -> Tuple[Score, ActionDodo]:
     """Algorithme alpha-beta pour le jeu dodo"""
     print("Appel alpha_beta_dodo", depth)  #!test
     if depth == 0 or final(grid, dico_conversion, direction):
@@ -465,7 +465,7 @@ def alpha_beta_dodo(
     return best_value, best_action
 
 
-def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> int:
+def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> float:
     """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
 
     grille, dico_conversion, direction = init_grille_dodo(taille_grille)

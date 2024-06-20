@@ -66,9 +66,9 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
-        if hex_size == 6 : 
+        if hex_size == 6 :
             environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_one_ligne()
-        else : 
+        else :
             environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_corners()
 
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
