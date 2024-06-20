@@ -66,7 +66,11 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
-        environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo(hex_size-1)
+        if hex_size == 6 : 
+            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_one_ligne()
+        else : 
+            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_corners()
+
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         environement["depth"] = 3
         print("Initialisation terminé pour le jeu Dodo")
@@ -82,7 +86,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         print("initialisation du joueur", player)
         environement["is_odd"] = True if hex_size % 2 == 1 else False #booleen qui determine si la taille de la grille est pair ou impaire
-        environement["depth"] = 6
+        environement["depth"] = 7
         #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
         print("Initialisation terminé pour le jeu Gopher de taille ", hex_size)
         print("Environement actuel : ", environement)
@@ -164,7 +168,7 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
     #! DODO
     if env["game"] == "dodo":
         print("strategy_brain::On joue a DODO")
-        _,action = dodo.alpha_beta_dodo(env["grille"], env["conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
+        _,action = dodo.alpha_beta_dodo(env["grille"], env["dico_conversion"],env["direction"], env["joueur"], env["depth"], -dodo.INF, dodo.INF)
         env["grille"] = dodo.play_action(env["grille"], env["dico_conversion"], action, env["joueur"])
         env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changer de joueur, on a fini de jouer c'est au tour de l'adversaire
         return env, action
@@ -194,7 +198,6 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
     else:
         print("Erreur: Le jeu n'existe pas")
         return (env, None)
-    
 
 
 

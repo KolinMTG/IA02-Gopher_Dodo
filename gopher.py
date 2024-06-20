@@ -1,5 +1,5 @@
 """auteur : Bastien CUVILLIER,Colin MANYRI,
-date : 19/06/2024, version : 1.0
+date : 19/06/2024, version : 1.4
 fichier contenant les fonctions pour le jeu gopher"""
 import random as rd
 from math import inf
