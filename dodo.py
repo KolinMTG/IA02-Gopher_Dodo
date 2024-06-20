@@ -323,7 +323,7 @@ def final(grille, dico_conversion, direction) -> float:
 
 def rd_rd_dodo() -> float:
     """fait jouer deux randoms pour le joueur donné"""
-    grille, dico_conversion, direction = init_grille_dodo(3)
+    grille, dico_conversion, direction = init_grille_dodo_one_line(3)
 
     joueur = ROUGE
     while True:
@@ -468,7 +468,7 @@ def alpha_beta_dodo(
 def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> float:
     """Boucle de jeu pour un joueur aléatoire et un joueur Alpha-Beta"""
 
-    grille, dico_conversion, direction = init_grille_dodo(taille_grille)
+    grille, dico_conversion, direction = init_grille_dodo_one_line(taille_grille)
     while True:
         liste_coups = liste_coup_legaux(grille, dico_conversion, direction, BLEU)
         coup = rd.choice(liste_coups)
