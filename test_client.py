@@ -56,7 +56,7 @@ NDEF = -1 #case non définie
 print("Client started")
 
 
-def initialize(game: str, state: State, player: Player, hex_size: int, total_time: Time):
+def initialize(game: str, state: State, player: Player, hex_size: int, total_time: Time) -> Environment:
     print(game)
     """initialise l'environement en fonction du jeu choisi"""
     print("Initialisation de l'environement")
@@ -66,6 +66,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
+        environement["joueur"] = ROUGE
 
         compteur_one_ligne = 0
         compteur_corner = 0
@@ -87,6 +88,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         else : #cas d'un jeu one line
             environement["grille"], environement["dico_conversion"], environement["direction"]= dodo.init_grille_dodo_one_line(hex_size-1)
             aff.afficher_hex(environement["grille"], environement["dico_conversion"])
+        return environement
 
 
     #! GOPHER
