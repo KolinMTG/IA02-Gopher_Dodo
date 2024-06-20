@@ -66,10 +66,27 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
-        if hex_size == 6 : 
-            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_one_ligne()
-        else : 
-            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_corners()
+        compteur_one_ligne = 0
+        compteur_corner = 0
+
+        #parcour du state pour savoir dans quel mode on est
+        for element in state :
+            case = element[0]
+            value = element[1]
+            if case[0] + case [1] == hex_size -2 or case[0] + case[1] == -hex_size +2:
+                if value == ROUGE or value == BLEU:
+                    compteur_one_ligne +=1
+                elif value == EMPTY :
+                    compteur_corner +=1
+
+        #initialisation de la grille
+        if compteur_one_ligne <= 1: #cas d'un jeu corner
+            environement["grille"], environement["dico_conversion"], environement["direction"]= dodo.init_grille_dodo_corners(hex_size-1)
+            aff.afficher_hex(environement["grille"], environement["dico_conversion"])
+        else : #cas d'un jeu one line
+            environement["grille"], environement["dico_conversion"], environement["direction"]= dodo.init_grille_dodo_one_line(hex_size-1)
+            aff.afficher_hex(environement["grille"], environement["dico_conversion"])
+
 
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         environement["depth"] = 3

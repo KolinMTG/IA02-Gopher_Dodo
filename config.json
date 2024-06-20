@@ -1,19 +1,69 @@
 {
     "MatchMakingStrategy": "fifo",
     "StartingPlayer": "red",
-    "GameTime": 1000,
     "BackupFilename": "server.json",
     "ServerAddr": ":8080",
-    "GridPossibleSizes": [
-        4,
-        6
+    "GridPossibleSizes": null,
+    "FIFOPossibleGames": [
+        {
+            "Game": 1,
+            "GridSize": 4,
+            "DodoConfig": "corners",
+            "PlayerInitialTime": 360,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        },
+        {
+            "Game": 1,
+            "GridSize": 6,
+            "DodoConfig": "corners",
+            "PlayerInitialTime": 360,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        },
+        {
+            "Game": 1,
+            "GridSize": 4,
+            "DodoConfig": "one_line",
+            "PlayerInitialTime": 360,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        },
+        {
+            "Game": 1,
+            "GridSize": 6,
+            "DodoConfig": "one_line",
+            "PlayerInitialTime": 360,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        },
+        {
+            "Game": 0,
+            "GridSize": 4,
+            "DodoConfig": "one_line",
+            "PlayerInitialTime": 180,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        },
+        {
+            "Game": 0,
+            "GridSize": 6,
+            "DodoConfig": "one_line",
+            "PlayerInitialTime": 180,
+            "RedPlayer": "",
+            "BluePlayer": ""
+        }
     ],
+    "DodoConfigs": null,
+    "PenaliteIllegalAction": 40,
     "Tournaments": [
         {
             "Name": "Warm Up",
             "Param": {
                 "Game": 1,
-                "GridSize": 5,
+                "GridSize": 4,
+                "DodoConfig": "corners",
+                "PlayerInitialTime": 360,
                 "RedPlayer": "",
                 "BluePlayer": ""
             },
@@ -21,10 +71,12 @@
             "WarmUpRounds": 2
         },
         {
-            "Name": "DODO 5",
+            "Name": "DODO 6",
             "Param": {
                 "Game": 1,
-                "GridSize": 5,
+                "GridSize": 6,
+                "DodoConfig": "one_line",
+                "PlayerInitialTime": 0,
                 "RedPlayer": "",
                 "BluePlayer": ""
             },
