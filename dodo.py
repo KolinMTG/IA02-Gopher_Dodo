@@ -65,7 +65,7 @@ def liste_to_tuple(lis: List) -> Tuple:
 # initialisation de la grille en suivant les règle
 # du jeu dodo pour n'importe quelles tailles de grilles
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
-def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict[tuple[int,int],tuple[int,int]], DirectionJeu]:  #!OK
+def init_grille_dodo_one_line(taille_grille: int) -> Tuple[Grid, Dict[tuple[int,int],tuple[int,int]], DirectionJeu]:  #!OK
     """Initialise la grille de jeu avec les pions au bon endroit.
     Et initialisation du dico de conversion."""
     taille_array = 2 * taille_grille + 1
@@ -110,9 +110,9 @@ def init_grille_dodo(taille_grille: int) -> Tuple[Grid, Dict[tuple[int,int],tupl
 # Initialisation de dodo pour un jeu en mode corners et
 # une taille de grille de 3 (cas du serveur avec petite grille)
 #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
-def init_grille_dodo_corners() -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
+def init_grille_dodo_corners(taille_grille: int) -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
     """Initialise la grille de jeu avec les pions au bon endroit. Et initialisation du dico de conversion."""
-    taille_grille = 3
+
     taille_array = 2 * taille_grille + 1
     dico_conversion = {}
     grille = np.full((taille_array, taille_array), NDEF)
@@ -155,54 +155,54 @@ def init_grille_dodo_corners() -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
 
 
 # initialisation du jeu dodo pour une grille de taille 5 avec ligne blanche au centre (deuxième cas du serveur)
-#!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
-def init_grille_dodo_one_ligne() -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
-    """Initialise la grille de jeu avec les pions au bon endroit. Et initialisation du dico de conversion."""
-    taille_grille = 5
-    taille_array = 2 * taille_grille + 1
-    dico_conversion = {}
-    grille = np.full((taille_array, taille_array), NDEF)
+# #!   /!\ le dico_conversion contient des clés de type Cell_hex et des valeurs de type Cell_mat /!\
+# def init_grille_dodo_one_ligne() -> Tuple[Grid, Dict, DirectionJeu]:  #!OK
+#     """Initialise la grille de jeu avec les pions au bon endroit. Et initialisation du dico de conversion."""
+#     taille_grille = 5
+#     taille_array = 2 * taille_grille + 1
+#     dico_conversion = {}
+#     grille = np.full((taille_array, taille_array), NDEF)
 
-    #! initialisation du dico de conversion pour les coordonnées des cases de jeu
-    compteur = taille_grille
-    for i in range(taille_grille):  # remplir la premiere partie
-        for j in range(compteur, taille_array):
-            dico_conversion[(j - taille_grille, taille_grille - i)] = (i, j)
-        compteur -= 1
-    for j in range(taille_array):  # remplir la ligne du milieu
-        dico_conversion[(j - taille_grille, 0)] = (taille_grille, j)
-    compteur = 1
-    for i in range(taille_grille + 1, taille_array):  # remplir le reste
-        for j in range(taille_array - compteur):
-            dico_conversion[(j - taille_grille, taille_grille - i)] = (i, j)
-        compteur += 1
+#     #! initialisation du dico de conversion pour les coordonnées des cases de jeu
+#     compteur = taille_grille
+#     for i in range(taille_grille):  # remplir la premiere partie
+#         for j in range(compteur, taille_array):
+#             dico_conversion[(j - taille_grille, taille_grille - i)] = (i, j)
+#         compteur -= 1
+#     for j in range(taille_array):  # remplir la ligne du milieu
+#         dico_conversion[(j - taille_grille, 0)] = (taille_grille, j)
+#     compteur = 1
+#     for i in range(taille_grille + 1, taille_array):  # remplir le reste
+#         for j in range(taille_array - compteur):
+#             dico_conversion[(j - taille_grille, taille_grille - i)] = (i, j)
+#         compteur += 1
 
-    for (
-        key
-    ) in (
-        dico_conversion.keys()
-    ):  # initialisation de la grille : toutes les cases qui ne sont pas en clé du dico n'existent pas
-        x_cell, y_cell = dico_conversion[
-            key
-        ]  #! type de dico_conversion[key] : Cell_mat
-        if (
-            key[0] + key[1] >= taille_grille - 2
-        ):  # on remplit la grille avec les pions bleu
-            grille[x_cell][y_cell] = BLEU
-        elif (
-            key[0] + key[1] <= -taille_grille + 2
-        ):  # on remplit la grille avec les pions rouges
-            grille[x_cell][y_cell] = ROUGE
-        else:
-            grille[x_cell][y_cell] = EMPTY  # on remplit la grille avec les cases vides
+#     for (
+#         key
+#     ) in (
+#         dico_conversion.keys()
+#     ):  # initialisation de la grille : toutes les cases qui ne sont pas en clé du dico n'existent pas
+#         x_cell, y_cell = dico_conversion[
+#             key
+#         ]  #! type de dico_conversion[key] : Cell_mat
+#         if (
+#             key[0] + key[1] >= taille_grille - 2
+#         ):  # on remplit la grille avec les pions bleu
+#             grille[x_cell][y_cell] = BLEU
+#         elif (
+#             key[0] + key[1] <= -taille_grille + 2
+#         ):  # on remplit la grille avec les pions rouges
+#             grille[x_cell][y_cell] = ROUGE
+#         else:
+#             grille[x_cell][y_cell] = EMPTY  # on remplit la grille avec les cases vides
 
-    liste_tmp = [tuple(grille[i]) for i in range(taille_array)]
-    grille_finale = tuple(liste_tmp)
-    return (
-        grille_finale,
-        dico_conversion,
-        {ROUGE: [(1, 0), (0, 1), (1, 1)], BLEU: [(-1, 0), (-1, -1), (0, -1)]},
-    )
+#     liste_tmp = [tuple(grille[i]) for i in range(taille_array)]
+#     grille_finale = tuple(liste_tmp)
+#     return (
+#         grille_finale,
+#         dico_conversion,
+#         {ROUGE: [(1, 0), (0, 1), (1, 1)], BLEU: [(-1, 0), (-1, -1), (0, -1)]},
+#     )
 
 
 #!test
