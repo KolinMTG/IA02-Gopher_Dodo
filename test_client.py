@@ -66,7 +66,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     if game == "dodo" or game == "Dodo" or game == "DODO":
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
-<<<<<<< HEAD
+
         compteur_one_ligne = 0
         compteur_corner = 0
 
@@ -88,18 +88,6 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
             environement["grille"], environement["dico_conversion"], environement["direction"]= dodo.init_grille_dodo_one_line(hex_size-1)
             aff.afficher_hex(environement["grille"], environement["dico_conversion"])
 
-=======
-        if hex_size == 6 :
-            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_one_ligne()
-        else :
-            environement["grille"], environement["dico_conversion"], environement["direction"] = dodo.init_grille_dodo_corners()
->>>>>>> 2e02864e524db745c095fe6ea01d63fa57006958
-
-        environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
-        environement["depth"] = 3
-        print("Initialisation terminé pour le jeu Dodo")
-        print("Environement actuel : ", environement)
-        return environement
 
     #! GOPHER
     if game == "gopher" or game == "Gopher" or game == "GOPHER":
