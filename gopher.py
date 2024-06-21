@@ -28,12 +28,10 @@ Cell = Tuple[int, int]  # Coordonnées d'une case
 CellMat = Cell  # Coordonnées d'une case dans la matrice
 CellHex = Cell  # Coordonnées d'une case dans l'affichage hexagonal a fournir au serveur
 
-GridTuple = Tuple[
-    Tuple[GameValue]
-]  # La grille de jeu, est un tableau numpy 2D de GameValue
-GridList = List[
-    List[GameValue]
-]  # La grille de jeu, est un tableau numpy 2D de GameValue
+GridTuple = Tuple[Tuple[GameValue,...],...]  
+# La grille de jeu, est un tableau numpy 2D de GameValue
+GridList = List[List[GameValue]]  
+# La grille de jeu, est un tableau numpy 2D de GameValue
 
 
 ActionGopher = CellHex  # Action du gopher
@@ -43,7 +41,7 @@ Action = Union[ActionGopher, ActionDodo]  # Action du joueur
 DictConv = Dict[CellMat, CellHex]  # Dictionnaire de conversion de coordonnées
 
 DictLegalGopher = Dict[ActionGopher, bool]  # Dictionnaire des coups légaux
-TupleLegalGopher = Tuple[Tuple[ActionDodo, bool]]  # Tuple des coups légaux
+TupleLegalGopher = Tuple[Tuple[ActionGopher, bool]]  # Tuple des coups légaux
 
 
 State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
@@ -69,7 +67,7 @@ def tuple_to_list(tup: GridTuple) -> GridList:
     liste_tmp = [tup[i] for i in range(len(tup))]
     for i, item in enumerate(liste_tmp):
         if isinstance(item, tuple):
-            liste_tmp[i] = tuple_to_list(item)
+            liste_tmp[i] = list(item)
     return liste_tmp
 
 
@@ -300,7 +298,7 @@ def final(
     return liste_coup_legaux(dico_legaux, player) == []
 
 
-def score_final(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> int:  #!OK
+def score_final(dico_legaux: Tuple[TupleLegalGopher, TupleLegalGopher]) -> Score:  #!OK
     """Renvoie le score final, renvoie 0 si la partie n'est pas fini,
     1 si le joueur ROUGE a gagné, -1 si le joueur BLEU a gagné"""
     if liste_coup_legaux(dico_legaux, ROUGE) == []:

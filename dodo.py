@@ -3,7 +3,7 @@ date : 19/06/2024, version : 1.32
 fichier contenant les fonctions pour le jeu dodo"""
 
 
-from typing import Union, List, Tuple, Dict,Any
+from typing import Union, List, Tuple, Dict, Any
 import random as rd
 from math import inf
 from numpy.typing import NDArray
@@ -29,7 +29,7 @@ ActionDodo = tuple[Cell, Cell]  # case de départ -> case d'arrivée
 Action = Union[ActionGopher, ActionDodo]
 Player = int  # 1 ou 2
 State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
-Score = int
+Score = float
 Time = int
 DirectionJeu = Dict
 # contient un vecteur direction qui selon lequel chaque joueur doit progresser pour gagner
@@ -423,7 +423,7 @@ def trier_actions(
 @memoize
 def alpha_beta_dodo(
     grid: Grid, dico_conversion, direction, player_max: Player, depth, alpha, beta
-) -> Tuple[Score, ActionDodo]:
+) -> Tuple[Score, ActionDodo | None]:
     """Algorithme alpha-beta pour le jeu dodo"""
     # print("Appel alpha_beta_dodo", depth)  #!test
     if depth == 0 or final(grid, dico_conversion, direction):
