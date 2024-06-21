@@ -69,7 +69,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         #initialisation de l'environement pour dodo
         environement["game"] = "dodo"
         environement["joueur"] = ROUGE
-        environement["depth"] = 3
+        environement["depth"] = 6
         environement["player_we_are"] = player
         environement["premier_coup"] = True
 
