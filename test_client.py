@@ -103,7 +103,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         environement["joueur"] = ROUGE #on sait d'après les règles que c'est tjr ROUGE qui commence
         environement["player_we_are"] = player
         environement["premier_coup"] = True
-        environement["is_odd"] = True if hex_size % 2 == 1 else False #booleen qui determine si la taille de la grille est pair ou impaire
+        environement["is_odd"] = True if hex_size % 2 == 1  and hex_size >= 5 else False #booleen qui determine si la taille de la grille est pair ou impaire
         environement["depth"] = 7
         #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
         print("Initialisation terminé pour le jeu Gopher de taille ", hex_size)

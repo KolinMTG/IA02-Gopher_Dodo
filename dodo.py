@@ -289,10 +289,10 @@ def liste_coup_legaux(
     # print(direction[joueur])
     return liste_coups
 
-grille, dico_conversion, direction = init_grille_dodo_one_line(3)
-print(liste_coup_legaux(grille, dico_conversion, direction, ROUGE))
-print(liste_coup_legaux(grille, dico_conversion, direction, BLEU))
-aff.afficher_hex(grille, dico_conversion)
+# grille, dico_conversion, direction = init_grille_dodo_one_line(3)
+# print(liste_coup_legaux(grille, dico_conversion, direction, ROUGE))
+# print(liste_coup_legaux(grille, dico_conversion, direction, BLEU))
+# aff.afficher_hex(grille, dico_conversion)
 
 
 
