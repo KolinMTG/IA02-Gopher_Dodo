@@ -160,8 +160,12 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
 
 
 def strategy_brain(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
-    if env["player_we_are"] == BLEU: #si on est bleu, c'est adversaire qui commence, donc on met a jour l'environement avant de jouer
-        env, action_adverse = update_env(env, state)
+
+    print("avant update env")
+    aff.afficher_hex(env["grille"], env["dico_conversion"])
+    env, action_adverse = update_env(env, state)
+    print("apres update env")
+    aff.afficher_hex(env["grille"], env["dico_conversion"])
 
     #! DODO
     if env["game"] == "dodo":
@@ -187,9 +191,8 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
             _,action = goph.alpha_beta(env["grille"],env["dico_conversion"], env["joueur"],env["dico_legaux"], env["depth"], -goph.INF, goph.INF)
             env["grille"], env["dico_legaux"] = goph.play_action(env["grille"], env["dico_conversion"], action, env["joueur"], env["dico_legaux"])
             env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changement de joueur, on a fini de jouer c'est au tour de l'adversaire
-
-    if env["player_we_are"] == ROUGE: #si on est rouge, c'est adversaire qui commence, donc on met a jour l'environement après avoir joué
-        env, action_adverse = update_env(env, state)
+    print("grille après notre coup")
+    aff.afficher_hex(env["grille"], env["dico_conversion"])
     return env, action_adverse
 
 

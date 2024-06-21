@@ -423,7 +423,7 @@ def trier_actions(
 @memoize
 def alpha_beta_dodo(
     grid: Grid, dico_conversion, direction, player_max: Player, depth, alpha, beta
-) -> Tuple[Score, ActionDodo | None]:
+) -> Tuple[Score, ActionDodo]:
     """Algorithme alpha-beta pour le jeu dodo"""
     # print("Appel alpha_beta_dodo", depth)  #!test
     if depth == 0 or final(grid, dico_conversion, direction):
