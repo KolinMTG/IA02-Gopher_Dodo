@@ -2,15 +2,16 @@
 date : 19/06/2024, version : 1.32
 fichier contenant les fonctions pour le jeu dodo"""
 
+
 from typing import Union, List, Tuple, Dict,Any
 import random as rd
 from math import inf
 from numpy.typing import NDArray
 import numpy as np
 
-# import affichage as aff
+import affichage as aff
 
-# import affichage as aff
+
 # Types de base utilisés par l'arbitre
 Grid = tuple[tuple[Any,...],...]  # Grille de jeu (tableau 2D de cases)
 # chaque case est un tuple (x, y) qui permet d'optenir la Value de la case dans la Grid_value
@@ -272,6 +273,8 @@ def est_legal(
     return False
 
 
+
+
 def liste_coup_legaux(
     grille: Grid, dico_conversion: Dict, direction: DirectionJeu, joueur: Player
 ) -> List[ActionDodo]:
@@ -285,6 +288,12 @@ def liste_coup_legaux(
                 liste_coups.append((cell_depart, cell_arrivee))
     # print(direction[joueur])
     return liste_coups
+
+grille, dico_conversion, direction = init_grille_dodo_one_line(3)
+print(liste_coup_legaux(grille, dico_conversion, direction, ROUGE))
+print(liste_coup_legaux(grille, dico_conversion, direction, BLEU))
+aff.afficher_hex(grille, dico_conversion)
+
 
 
 def play_action(
@@ -416,7 +425,7 @@ def alpha_beta_dodo(
     grid: Grid, dico_conversion, direction, player_max: Player, depth, alpha, beta
 ) -> Tuple[Score, ActionDodo]:
     """Algorithme alpha-beta pour le jeu dodo"""
-    print("Appel alpha_beta_dodo", depth)  #!test
+    # print("Appel alpha_beta_dodo", depth)  #!test
     if depth == 0 or final(grid, dico_conversion, direction):
         return final(grid, dico_conversion, direction), None
 
@@ -470,6 +479,7 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> float:
 
     grille, dico_conversion, direction = init_grille_dodo_one_line(taille_grille)
     while True:
+        # aff.afficher_hex(grille, dico_conversion) #!test
         liste_coups = liste_coup_legaux(grille, dico_conversion, direction, BLEU)
         coup = rd.choice(liste_coups)
         grille = play_action(grille, dico_conversion, coup, BLEU)
@@ -478,7 +488,12 @@ def boucle_rd_alpha_beta(taille_grille: int, depth: int) -> float:
         _, coup = alpha_beta_dodo(
             grille, dico_conversion, direction, ROUGE, depth, -INF, INF
         )
+        if coup not in liste_coup_legaux(grille, dico_conversion, direction, ROUGE) : 
+            print("ERREUR")
         grille = play_action(grille, dico_conversion, coup, ROUGE)
         if final(grille, dico_conversion, direction):
             break
     return final(grille, dico_conversion, direction)
+
+
+# print(boucle_rd_alpha_beta(3, 3)) #!test
