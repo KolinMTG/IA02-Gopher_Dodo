@@ -111,7 +111,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     print("Erreur: Le jeu n'existe pas")
     return {}
 
-
+premier_coup = True
 
 def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
     """fonction permettant de recuperer le coup joué par l'adversaire et de le jouer afin de mettre a jour la grille
@@ -161,11 +161,9 @@ def update_env(env: Environment, state:State) -> Tuple[Environment, Action]:
 
 def strategy_brain(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
 
-    print("avant update env")
-    aff.afficher_hex(env["grille"], env["dico_conversion"])
-    env, action_adverse = update_env(env, state)
-    print("apres update env")
-    aff.afficher_hex(env["grille"], env["dico_conversion"])
+    if env["player_we_are"] == BLEU:
+        env, action_adverse = update_env(env, state)
+
 
     #! DODO
     if env["game"] == "dodo":
@@ -179,6 +177,7 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
 
     #! GOPHER
     if env["game"] == "gopher":
+
         print("strategy_brain::On joue a GOPHER")
         if env["is_odd"]:
             #strategie gopher pour les grilles impaire >= 5 et joueur = rouge
@@ -191,11 +190,14 @@ def strategy_brain(env: Environment, state: State, player: Player, time_left: Ti
             _,action = goph.alpha_beta(env["grille"],env["dico_conversion"], env["joueur"],env["dico_legaux"], env["depth"], -goph.INF, goph.INF)
             env["grille"], env["dico_legaux"] = goph.play_action(env["grille"], env["dico_conversion"], action, env["joueur"], env["dico_legaux"])
             env["joueur"] = ROUGE if env["joueur"] == BLEU else BLEU #changement de joueur, on a fini de jouer c'est au tour de l'adversaire
-    print("grille après notre coup")
-    aff.afficher_hex(env["grille"], env["dico_conversion"])
-    return env, action_adverse
+    if env["player_we_are"] == ROUGE:
+        env, action_adverse = update_env(env, state)
+    return env, action
 
-
+#TODO Gopher joueur BLEU OK
+#TODO Dodo joueur BLEU OK
+#TODO Gopher joueur ROUGE A tester
+#TODO Dodo joueur ROUGE A tester
 
 
 # def strategy_brain(
