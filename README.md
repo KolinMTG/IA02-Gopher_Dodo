@@ -1,4 +1,6 @@
-# Projet IA02 
+
+
+# Projet IA02
 
 ## Auteurs
 
@@ -13,68 +15,61 @@ L'objectif de ce projet était de coder des algorithmes capables de jouer aux je
 2. Règles de Dodo : https://www.marksteeregames.com/Dodo_rules.pdf
 3. Règles de Gopher : https://www.marksteeregames.com/Gopher_hex_rules.pdf
 
-Par la suite, les différents algorithmes codés par les étudiants se sont affrontés lors d'un tournoi réalisé par l'intermédiaire d'un serveur en ligne. Les différents joueurs ont également un temps limité pour donner leurs coups, la rapidité et l'optimisation 
-des algorithmes est donc de mise.
+Par la suite, les différents algorithmes codés par les étudiants se sont affrontés lors d'un tournoi réalisé par l'intermédiaire d'un serveur en ligne. Les différents joueurs ont également un temps limité pour donner leurs coups, la rapidité et l'optimisation des algorithmes sont donc de mise.
 
-## Structure globale 
 
-Ce repository est composé de 7 fichiers : 
-1. Le fichier `Readme.md`, read me ci-présent
+## Structure globale
+
+Ce repository est composé de 7 fichiers :
+1. Le fichier `Readme.md`, le présent fichier README
 2. Le fichier `gnd.client.py` qui implémente les fonctionnalités du serveur
 3. Le fichier `gndserver.exe` qui doit être exécuté pour lancer le serveur
-4. Le fichier `affichage.py` qui implémente un affichage "userfriendly" des jeux
-5. Le fichier `gopher.py` implémente notre algorithme pour Gopher
+4. Le fichier `affichage.py` qui implémente un affichage convivial des jeux
+5. Le fichier `gopher.py` qui implémente notre algorithme pour Gopher
 6. Le fichier `dodo.py` qui implémente notre algorithme pour Dodo
 7. Le fichier `test_client.py` qui permet de jouer sur le serveur avec nos algorithmes
 
+## Choix de représentation des données
 
-## Choix de représentation des données 
-- Coordonnées : 
-![Systeme de coordonnées presenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
-- Représentation par une matrice : 
-![Representation de la grille de taille 7 sous la forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
+- Coordonnées :
+![Système de coordonnées présenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
+- Représentation par une matrice :
+![Représentation de la grille de taille 7 sous forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
 
-## Choix de l'algorithme utilisé 
+## Choix de l'algorithme utilisé
 
-Pour notre projet nous voulions développer un algorithme capable de gagner des parties tout en gardant une grande rapidité d'exécution, nécessaire pour ne pas être en manque de temps contre d'autres joueurs. Un algorithme `alpha-beta` que nous avons fortement optimisé nous a semblé être une option adaptée. Notamment, la possibilité de choisir la profondeur de l'algorithme nous permet d'obtenir un algorithme efficace et suffisamment rapide pour répondre aux exigences du concours (quitte à diminuer la profondeur).
+Pour notre projet, nous avons développé un algorithme visant à maximiser les performances tout en maintenant une grande rapidité d'exécution, indispensable pour répondre aux contraintes de temps du concours contre d'autres joueurs. Nous avons choisi d'implémenter l'algorithme `alpha-beta`, que nous avons optimisé de manière significative. La flexibilité offerte par la possibilité de régler la profondeur de l'algorithme nous permet d'obtenir une solution efficace et suffisamment rapide en ajustant cette profondeur au besoin.
 
-Toujours dans une volonté d'améliorer les performances de notre algorithme nous avons implémenté de nombreuses optimisations que nous allons détailler :
-- Le calcule uniquement local des coups légaux pour gopher afin d'économiser du temps de calcul.
-- L'implémentation d'une fonction de mémoïzation pour l'algorithme alpha-beta.
-- L'implémentation d'une fonction de tri des nœuds de l'arbre de l'alpha-beta pour faire les coupures alpha et beta plus rapidement comme décrit dans le Wikipédia en version allemande de l'alpha-beta : https://de.wikipedia.org/wiki/Alpha-Beta-Suche 
-- L'implémentation d'une fonction de hashage des grilles de Gopher et Dodo qui permet d'économiser de l'espace mémoire dans le cache des grilles memoïzées.
-
+Dans notre démarche d'amélioration des performances de l'algorithme, nous avons mis en œuvre plusieurs optimisations détaillées ci-dessous :
+- Calcul localisé des coups légaux pour Gopher afin d'économiser du temps de calcul.
+- Utilisation d'une fonction de mémorisation pour l'algorithme alpha-beta.
+- Tri des nœuds de l'arbre alpha-beta pour optimiser les coupures alpha et beta, inspiré des pratiques décrites dans la version allemande de l'article Wikipédia sur l'alpha-beta : [Alpha-Beta-Suche](https://de.wikipedia.org/wiki/Alpha-Beta-Suche).
+- Mise en place d'une fonction de hachage pour les grilles de Gopher et Dodo, permettant d'économiser de l'espace mémoire en conservant les grilles mémorisées.
 
 
-## Calcul local des coups légaux pour Gopher 
 
-Nous avons remarqué que les coups joués par les joueurs dans le cas de Gopher n'influencent les coups légaux suivant que sur une partie locale de la grille, nous avons utilisé cette information pour ne recalculer que localement les coups légaux des différents joueurs. 
 
-Exemple : 
-Lorsqu'un joueur joue en position `(0,0)`, les coups légaux potentiellement changés sont les coups qui impliquent les cases voisines de la case remplie. Il suffit donc de tester la légalité des 6 cases voisines, c'est à dire les cases `(1, 1), (1, 0), (0,-1), (-1, -1), (-1, 0), (0, 1)`
+## Calcul local des coups légaux pour Gopher
 
-Stockage de l'information : nous avons choisi de stocker la liste des coups légaux dans un dictionnaire python `dico_legaux` de type `Dict[Case, bool]`, les coups légaux ont une value True. 
-Ce système de stockage permet de tester si le coup existe (d'un point de vue de la grille donné, qui est de taille variable)
+Nous avons remarqué que les coups joués par les joueurs dans le cas de Gopher n'influencent les coups légaux suivants que sur une partie locale de la grille. Nous avons utilisé cette information pour ne recalculer que localement les coups légaux des différents joueurs.
 
-Dans `Gopher.py`, la fonction `init_dico_legaux_gopher()` permet d'initialiser les dictionnaires des coups légaux (tous les coups à False au début du jeu).
-Puis la fonction update_dico_legaux() permet de mettre à jour les dictionnaires des coups légaux pour les deux joueurs, après qu'un coup ait été joué. 
-Cette fonction est appelée dans la fonction de mise à jour de l'environnement `play_action()` qui permet de jouer une action donnée pour un joueur donné et qui renvoie l'environnement (c'est à dire l'ensemble des informations nécéssaires au jeu) modifié par le coup. 
+Exemple :
+Lorsqu'un joueur joue en position `(0,0)`, les coups légaux potentiellement changés sont les coups qui impliquent les cases voisines de la case remplie. Il suffit donc de tester la légalité des 6 cases voisines : `(1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (0, 1)`.
 
-Notre méthode utilisé pour determiner les coups légaux constitue un gain en temps de calcule non négligable. En effet, nous sommes alors restreint au test de la legalité de, au plus, six voisins de la dernière action jouée. 
-D'un point de vu plus quantitatif :
+Stockage de l'information : nous avons choisi de stocker la liste des coups légaux dans un dictionnaire Python `dico_legaux` de type `Dict[Case, bool]`, où les coups légaux sont représentés par `True`. Ce système permet de vérifier rapidement l'existence d'un coup dans la grille, qui peut varier en taille.
 
-Une grille hexagonale de taille N, contient 3N(N-1)+1 cases, nous laissons au lecteur le soin de la démonstration (vous pouvez raisonner sur la taille de la matrice donnée dans la partie `choix de la représentation des données`).
-Notre calcul permet donc de passer d'une complexité O(N^2), en effet 3N(N-1)+1 ~ N^2, à une complexité constante O(1) sur cette partie du calcul de complexité.
+Dans `Gopher.py`, la fonction `init_dico_legaux_gopher()` initialise les dictionnaires des coups légaux (tous les coups sont initialisés à `False` au début du jeu). Ensuite, la fonction `update_dico_legaux()` met à jour ces dictionnaires après qu'un coup a été joué par un joueur. Cette fonction est appelée depuis la fonction `play_action()`, qui gère l'exécution d'une action pour un joueur donné et retourne l'environnement modifié (c'est-à-dire toutes les informations nécessaires au jeu).
 
-Pourquoi ne pas utiliser la même technique sur Dodo ? 
-Dodo est un jeu plus complexe car les jetons ne sont pas uniquement placés sur les cases mais déplacés d'une case à l'autre. Implémenter le stockage de la liste de tous les coups possibles sous forme d'un dictionnaire revient alors à stocker tous les couples de cases possibles ce qui prendrait énormément de place. De plus, la complexité de l'update de ce dictionnaire ne ferait finalement pas gagner beaucoup de temps par rapport au calcul naïf de la légalité des coups pour toutes les cases.
+Notre méthode pour déterminer les coups légaux offre un gain significatif en termes de temps de calcul. En restreignant le test à au plus six voisins de la dernière action jouée, nous passons d'une complexité O(N^2), où N est la taille de la grille, à une complexité constante O(1) pour cette partie du calcul.
 
-## Tri des noeuds du alpha-beta 
+Pourquoi ne pas utiliser la même technique pour Dodo ?
+Dodo est un jeu plus complexe où les jetons peuvent être déplacés d'une case à l'autre, et non seulement placés sur des cases. Stocker la liste complète de tous les coups possibles sous forme de dictionnaire serait donc très coûteux en termes de mémoire. De plus, la complexité de la mise à jour de ce dictionnaire ne justifierait pas l'économie de temps par rapport au calcul direct de la légalité des coups pour toutes les cases.
 
-Après avoir effectué des recherches sur les améliorations possibles à apporter à l'alpha-beta, nous avons appris qu'il était possible de trier les noeuds (c'est-à-dire les coups testés) de l'alpha-beta. Ce tri de noeuds permet d'effectuer les coupures alpha ou beta plus rapidement, les branches les plus interessantes étant testées en premières. D'après le lien du Wikipedia donné plus tôt, cette implémentation permet d'améliorer le temps de calcul d'un facteur 10 : 
+## Tri des noeuds de l'alpha-beta
 
-Voici ce qui est indiqué dans le Wiki :  
+En explorant les améliorations possibles de l'algorithme alpha-beta, nous avons découvert qu'il était bénéfique de trier les noeuds (c'est-à-dire les coups testés) de l'alpha-beta. Ce tri permet d'effectuer les coupures alpha ou beta plus rapidement, en testant d'abord les branches les plus prometteuses. Selon l'article de Wikipedia précédemment mentionné, cette optimisation peut réduire le temps de calcul par un facteur significatif :
 
+Voici ce qui est indiqué dans l'article :
 Algorithmus	Bewertungen	Cutoffs	Anteil der Cutoffs	Rechenzeit in Sekunden  
 **Minimax**	28.018.531	0	0,00 %	134,87 s (Algorithme minmax)  
 **AlphaBeta**	2.005.246	136.478	91,50 %	9,88 s (Algorithme alpha-beta)  
@@ -93,14 +88,14 @@ Afin de représenter au mieux l'état de jeu, que cela soit sur dodo ou gopher, 
 
 Comment obtenir cette chaine de caractère?
 
-Nous utilison la fonction `hashing` qui prend en paramètre la grille actuelle des *GameValues*. Elle va parcourir la grille et à chaque case rencontrée, elle va ajouter dans la chaine de caractère de sortie le chiffre 0, 1 ou 2.
+Nous utilison la fonction `hashing()` qui prend en paramètre la grille actuelle des *GameValues*. Elle va parcourir la grille et à chaque case rencontrée, elle va ajouter dans la chaine de caractère de sortie le chiffre 0, 1 ou 2.
 - 0 si la case est innocupée (`EMPTY`)
 - 1 si la case est occupée par le joueur rouge (`ROUGE`)
 - 2 si la case est occupée par le joueur bleu (`BLEU`)
 
-Nous obtenons alors un grand nombre représentant l'état de la grille à un moment donné. Ce nombre est ensuite converti de la base 10 à la base 64 (fonction `base64`) pour obtenir une chaine de caractère plus courte. Nous occupons ainsi moins de place en mémoire.
+Nous obtenons alors un grand nombre représentant l'état de la grille à un moment donné. Ce nombre est ensuite converti de la base 10 à la base 64 (fonction `base64()`) pour obtenir une chaine de caractère plus courte. Nous occupons ainsi moins de place en mémoire.
 
-`hashing` renvoie alors la chaine de caractère convertie précédemment en base 64. Pour information, nous utilisons l'alphabet suivant : `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,`.
+`hashing()` renvoie alors la chaine de caractère convertie précédemment en base 64. Pour information, nous utilisons l'alphabet suivant : `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,`.
 
 ### Gestion des symetries
 
@@ -109,7 +104,7 @@ La fonction `reflexion()` permet de calculer l'ensemble des symetries pour une g
 
 ### Fonction de memoïzation
 
-La fonction `memoize` est ensuite utilisée comme *decorator* de la fonction `alpha_beta`. Elle permet à chaque coup calculé (ou non) par celui-ci de stocker le nouveau coup calculé dans un dictionnaire de la forme `Dict[str, Tuple[int, int]]` (pour gopher) ou `Dict[str, Tuple[Tuple[int, int],Tuple[int, int]]]` (pour dodo). La clé de ce dictionnaire est la chaine de caractère obtenue par la fonction `hashing` et la valeur associée est le meilleur coup calculé pour cet état de jeu.
+La fonction `memoize()` est ensuite utilisée comme *decorator* de la fonction `alpha_beta()`. Elle permet à chaque coup calculé (ou non) par celui-ci de stocker le nouveau coup calculé dans un dictionnaire de la forme `Dict[str, Tuple[int, int]]` (pour gopher) ou `Dict[str, Tuple[Tuple[int, int],Tuple[int, int]]]` (pour dodo). La clé de ce dictionnaire est la chaine de caractère obtenue par la fonction `hashing()` et la valeur associée est le meilleur coup calculé pour cet état de jeu.
 
 Le cas de gopher est particulier car le plateau de jeu comporte un grand nombre de symétries. A chaque nouveau coup calculé, nous stockons si cela n'a pas déjà été fait, les 6 reflexions ainsi que les 6 rotations provenant de ces réflexions dans le cache. Donc à chaque coup, nous stockons potentiellement 36 états de jeu dans le cache.
 
