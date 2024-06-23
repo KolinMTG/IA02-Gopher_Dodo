@@ -20,8 +20,8 @@ Par la suite, les différents algorithmes codés par les étudiants se sont affr
 ## Structure globale
 
 Ce repository est composé de 7 fichiers :
-1. Le fichier `Readme.md`, le présent fichier README
-2. Le fichier `gnd.client.py` qui implémente les fonctionnalités du serveur
+1. Le fichier `README.md`, le présent fichier README
+2. Le fichier `gndclient.py` qui implémente les fonctionnalités du serveur
 3. Le fichier `gndserver.exe` qui doit être exécuté pour lancer le serveur
 4. Le fichier `affichage.py` qui implémente un affichage convivial des jeux
 5. Le fichier `gopher.py` qui implémente notre algorithme pour Gopher
