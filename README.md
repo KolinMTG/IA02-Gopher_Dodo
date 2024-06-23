@@ -166,8 +166,6 @@ rm config.json server.json
 
 Il faut donc dans un premier temps lancer un terminal et se rendre dans le répertoire où se trouve le serveur. On y lance le serveur avec les options souhaitées.
 
-## Utilisation du client
-
 Rendez-vous encore une fois dans un terminal après avoir lancé le serveur. Veillez au préalable d'avoir:
 
 1. Copié le fichier `gndclient.py` dans votre répertoire de travail
@@ -183,3 +181,15 @@ python test_client.py 12 toto totovelo
 Avec `12` le numéro de groupe, `toto` le nom du joueur et `totovelo` le mot de passe du joueur.
 
 Un partie devrait alors se lancer et se jouer devant vos yeux.
+
+
+## Ce qui a été considéré ou qui a moins bien marché.
+
+### Utilisation du multicoeur
+
+Nous avions considéré l'utilisation du multicoeur pour l'exécution de tous les alpha-betas lors d'un tour de jeu. Après implémentation, notre programme n'était pas plus rapide, voire, dans certains cas, plus lent. Nous avons donc abandonné cette piste d'optimisation.
+
+### Les coups légaux via l'API.
+
+Malgré le fait que notre programme fonctionne sans problèmes en local, nous avons rencontré des problèmes lors de l'utilisation du serveur pendant le tournoi. Il semblerait que notre programme renvoyait des coups illégaux alors que ce problème ne s'était jamais manifesté en local à la fois via notre boucle de jeu maison et à la fois via la boucle de jeu du serveur.
+Nous n'avons pas réussi à trouver la source du problème.
