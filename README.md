@@ -79,7 +79,15 @@ Dodo est un jeu, plus complexe car les jetons ne sont pas uniquement placés sur
 
 ## Fonction de tri des noeuds de l'alpha-beta 
 
-Après avoir effectué des recherches sur les amélioration possible à apporter au alpha-beta, nous avons apris qu'il était possible de trier les noeuds (c'est-à-dire les coups testé) du alpha-beta. Ce tri de noeuds permet d'effectuer les coupures alpha ou beta plus rapidement, les branches les plus interessantes étant testées en premier. D'après le
+Après avoir effectué des recherches sur les amélioration possible à apporter au alpha-beta, nous avons apris qu'il était possible de trier les noeuds (c'est-à-dire les coups testé) du alpha-beta. Ce tri de noeuds permet d'effectuer les coupures alpha ou beta plus rapidement, les branches les plus interessantes étant testées en premier. D'après le lien du Wikipedia donné plus tôt, cette implementation permet d'ameliorer le temps de calcule d'un facteur 10 : 
+
+Voici ce qui est indiqué dans le Wiki :  
+
+Algorithmus	Bewertungen	Cutoffs	Anteil der Cutoffs	Rechenzeit in Sekunden  
+Minimax	28.018.531	0	0,00 %	134,87 s (Algorithme minmax)  
+AlphaBeta	2.005.246	136.478	91,50 %	9,88 s (Algorithme alpha-beta)
+AlphaBeta + Zugsortierung	128.307	27.025	99,28 %	0,99 s (Algorithme alpha-beta avec tri des noeuds)
+
 
 ## Fonction de hashage 
 
