@@ -104,6 +104,13 @@ Nous obtenons alors un grand nombre représentant l'état de la grille à un mom
 
 `hashing` renvoie alors la chaine de caractère convertie précédemment en base 64. Pour information, nous utilisons l'alphabet suivant : `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,`.
 
+Nous avons testé cette fonction de hashage sur des grilles de taille 6 complètement remplies (pire des cas).
+- Le nombre brut sans conversion faisait la taille de la grille soit 3*6*(6-1)+1 = 91 caractères.
+- Le nombre converti en base 16 avait une taille de 76 caractères.
+- Le nombre converti en base 64 avait une taille de 51 caractères.
+
+Donc une amélioration de 40% de la taille de la chaine de caractère et donc par extension de la taille de la mémoire utilisée.
+
 ### Fonction de memoïzation
 
 La fonction `memoize` est ensuite utilisée comme *decorator* de la fonction `alpha_beta`. Elle permet à chaque coup calculé (ou non) par celui-ci de stocker le nouveau coup calculé dans un dictionnaire de la forme `Dict[str, Tuple[int, int]]` (pour gopher) ou `Dict[str, Tuple[Tuple[int, int],Tuple[int, int]]]` (pour dodo). La clé de ce dictionnaire est la chaine de caractère obtenue par la fonction `hashing` et la valeur associée est le meilleur coup calculé pour cet état de jeu.
