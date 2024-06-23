@@ -73,7 +73,7 @@ Dodo est un jeu plus complexe car les jetons ne sont pas uniquement placés sur 
 
 ## Tri des noeuds du alpha-beta 
 
-Après avoir effectué des recherches sur les amélioration possible à apporter au alpha-beta, nous avons apris qu'il était possible de trier les noeuds (c'est-à-dire les coups testé) du alpha-beta. Ce tri de noeuds permet d'effectuer les coupures alpha ou beta plus rapidement, les branches les plus interessantes étant testées en premier. D'après le lien du Wikipedia donné plus tôt, cette implementation permet d'ameliorer le temps de calcule d'un facteur 10 : 
+Après avoir effectué des recherches sur les améliorations possibles à apporter à l'alpha-beta, nous avons appris qu'il était possible de trier les noeuds (c'est-à-dire les coups testés) de l'alpha-beta. Ce tri de noeuds permet d'effectuer les coupures alpha ou beta plus rapidement, les branches les plus interessantes étant testées en premières. D'après le lien du Wikipedia donné plus tôt, cette implémentation permet d'améliorer le temps de calcul d'un facteur 10 : 
 
 Voici ce qui est indiqué dans le Wiki :  
 
