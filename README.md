@@ -8,7 +8,7 @@ Bastien Cuvillier, Colin Manyri
 
 Ce projet est a été réalisé dans le cadre de la formation d'ingénieur en Génie informatique à l'Universitée de Technologie de Compiègne (UTC) et plus présisement dans le cadre de l'UV IA02 : Logique et Résolution de problèmes par la recherche.
 
-L'objectif de ce projet était de coder des algorithmes capables de jouer aux jeu Gopher et Dodo de Mark Steere :
+L'objectif de ce projet était de coder des algorithmes capables de jouer aux jeux Gopher et Dodo de Mark Steere :
 1. Site de Mark Steere : https://www.marksteeregames.com
 2. Règles de Dodo : https://www.marksteeregames.com/Dodo_rules.pdf
 3. Règles de Gopher : https://www.marksteeregames.com/Gopher_hex_rules.pdf
@@ -16,7 +16,18 @@ L'objectif de ce projet était de coder des algorithmes capables de jouer aux je
 Par la suite, les differents algorithmes codés par les étudiants se sont affronté lors d'un tournoi résalisé par l'intermediaire d'un serveur en ligne. Les differents joueurs ont également un temps limité pour donner leurs coups, la rapidité et l'optimisation 
 des algorithmes est donc de mise.
 
-#
+## Structure gobale 
+
+Ce repository est composé de 7 fichiers : 
+1. Le Readme ci-present
+2. Le fichier `gnd.client.py` qui implemente les fonctionnalitées du serveur
+3. Le fichier `gndserver.exe` qui doit etre executé pour lancer le serveur
+4. Le fichier `affichage.py` qui implemente un affichage "userfriendly" des jeu
+5. Le fichier `gopher.py` implementes notre algorithme pour Gopher
+6. Le fichier `dodo.py` qui implemente notre algorithme pour le jeu Dodo
+7. Le fichier `test_client.py` qui permet de jouer sur le serveur avec nos algorithmes
+
+
 
 
 
