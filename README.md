@@ -41,9 +41,11 @@ Toujours dans une volonté d'ameliorer la performance de notre algorithme nous a
 
 ## Choix de representation des données 
 - Coordonnées : 
-![alt text](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
+![Systeme de coordonnée presenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
 - Representation par une matrice : 
-![alt text](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
+![Representation de la grille de taille 7 sous la forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
+
+
 
 
 ## Calcule local des coups legaux pour Gopher 
@@ -53,9 +55,19 @@ Nous avons remarqué que les coups joué par les joueurs dans le cas de Gopher n
 Exemple : 
 Lorsqu'un joueur joue en position `(0,0)`, les coups legaux potentiellements changés sont les coups qui impliquent les cases voisines de la case remplie. Ils suffit donc de tester la legalité des 6 cases voisines, c'est à dire les cases `(1, 1), (1, 0), (0,-1), (-1, -1), (-1, 0), (0, 1)`
 
+Stockage de l'information : nous avons choisit de stocker la liste des coups legaux dans un dictionnaire python `dico_legaux` de type `Dict[Case, bool]`, les coup legaux sont ont une value True. 
+Ce système de stockage permet a la fois de tester si le coup existe (d'un point de vu de la grille donné, qui est de taille variable )
+
+Dans `Gopher.py`, la fonction `init_dico_legaux_gopher()` permet d'initialiser les dictionnaires des coups légaux (tous les coup à False au début du jeu).
+Puis la fonction update_dico_legaux() permet de mettre a jour les dictionnaires des coups légaux pour les deux joueur, après qu'un coup ai été joué. 
+Cette fonction est appelé dans la fonction de mise a jours de l'environement `play_action()` qui permet de jouer une action donnée pour un joueur donnée et qui renvoie l'environement (c'est à dire l'ensemble des informations nécéssaire au jeu) modifié par le coup. 
+
+
 
 Pourquoi ne pas utiliser la même technique sur Dodo ? 
 Dodo est un jeu, plus complexe car les jetons ne sont pas uniquement placés sur les cases mais déplacés d'une case à l'autre. Implementer stocker la liste de tous les coups possible sous forme d'un dictionnaire revient alors a stocker tout les couples de cases possibles ce qui prendrais enormement de place. De plus, la complexité de l'update de ce dictionnaire ne ferais finalement pas gagner beaucoup de temps par rapport au calcule naïf de la légalité des coups pour toutes les cases.
+
+## Implementation de la memoïzation pour les joueurs 
 
 
 
