@@ -9,7 +9,7 @@ Bastien Cuvillier, Colin Manyri
 Ce projet est a été réalisé dans le cadre de la formation d'ingénieur en Génie informatique à l'Universitée de Technologie de Compiègne (UTC) et plus présisement dans le cadre de l'UV IA02 : Logique et Résolution de problèmes par la recherche.
 
 L'objectif de ce projet était de coder des algorithmes capables de jouer aux jeu Gopher et Dodo de Mark Steere :
-1. Site de Mark Steere : `https://www.marksteeregames.com/`
+1. Site de Mark Steere : https://www.marksteeregames.com
 2. Règles de Dodo : `https://www.marksteeregames.com/Dodo_rules.pdf`
 3. Règles de Gopher : `https://www.marksteeregames.com/Gopher_hex_rules.pdf`
 
