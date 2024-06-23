@@ -69,7 +69,7 @@ Notre méthode utilisé pour determiner les coups légaux constitue un gain en t
 D'un point de vu plus quantitatif :
 
 Une grille hexagonale de taille N, contient 3N(N-1)+1, nous laissons au lecteur le soin de la demonstration (vous pouvez raisonner sur la taille de la matrice donnée dans la partie `choix de la representation des données`).
-Notre calcul permet donc de passer d'une complexité O(N superscript^2^), en effet 3N(N-1)+1 ~ N superscript^2^, à une complexité constante O(1) sur cette partie du calcule de complexité. 
+Notre calcul permet donc de passer d'une complexité O(N^2^), en effet 3N(N-1)+1 ~ N^2^, à une complexité constante O(1) sur cette partie du calcule de complexité. 
 
 
 Pourquoi ne pas utiliser la même technique sur Dodo ? 
