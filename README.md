@@ -62,7 +62,11 @@ Dans `Gopher.py`, la fonction `init_dico_legaux_gopher()` permet d'initialiser l
 Puis la fonction update_dico_legaux() permet de mettre à jour les dictionnaires des coups légaux pour les deux joueurs, après qu'un coup ait été joué. 
 Cette fonction est appelée dans la fonction de mise à jour de l'environnement `play_action()` qui permet de jouer une action donnée pour un joueur donné et qui renvoie l'environnement (c'est à dire l'ensemble des informations nécéssaires au jeu) modifié par le coup. 
 
+Notre méthode utilisé pour determiner les coups légaux constitue un gain en temps de calcule non négligable. En effet, nous sommes alors restraint au testes de la legalité de au plus six voisins de la dernière action jouée. 
+D'un point de vu plus quantitatif :
 
+Une grille hexagonale de taille N, contient 3N(N-1)+1, nous laissons au lecteur le soin de la demonstration (vous pouvez raisonner sur la taille de la matrice donnée dans la partie `choix de la representation des données`).
+Notre calcul permet donc de passer d'une complexité O(N^2), en effet 3N(N-1)+1 ~ N^2, à une complexité constante O(1) sur cette partie du calcule de complexité.
 
 Pourquoi ne pas utiliser la même technique sur Dodo ? 
 Dodo est un jeu plus complexe car les jetons ne sont pas uniquement placés sur les cases mais déplacés d'une case à l'autre. Implémenter le stockage de la liste de tous les coups possibles sous forme d'un dictionnaire revient alors à stocker tous les couples de cases possibles ce qui prendrait énormément de place. De plus, la complexité de l'update de ce dictionnaire ne ferait finalement pas gagner beaucoup de temps par rapport au calcul naïf de la légalité des coups pour toutes les cases.
