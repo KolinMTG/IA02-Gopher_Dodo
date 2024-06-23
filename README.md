@@ -1,10 +1,9 @@
-
-
 # Projet IA02
 
 ## Auteurs
 
 Bastien Cuvillier, Colin Manyri
+
 
 ## Introduction
 
@@ -29,12 +28,14 @@ Ce repository est composé de 7 fichiers :
 6. Le fichier `dodo.py` qui implémente notre algorithme pour Dodo
 7. Le fichier `test_client.py` qui permet de jouer sur le serveur avec nos algorithmes
 
+
 ## Choix de représentation des données
 
 - Coordonnées :
 ![Système de coordonnées présenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
 - Représentation par une matrice :
 ![Représentation de la grille de taille 7 sous forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
+
 
 ## Choix de l'algorithme utilisé
 
@@ -45,8 +46,6 @@ Dans notre démarche d'amélioration des performances de l'algorithme, nous avon
 - Utilisation d'une fonction de mémorisation pour l'algorithme alpha-beta.
 - Tri des nœuds de l'arbre alpha-beta pour optimiser les coupures alpha et beta, inspiré des pratiques décrites dans la version allemande de l'article Wikipédia sur l'alpha-beta : [Alpha-Beta-Suche](https://de.wikipedia.org/wiki/Alpha-Beta-Suche).
 - Mise en place d'une fonction de hachage pour les grilles de Gopher et Dodo, permettant d'économiser de l'espace mémoire en conservant les grilles mémorisées.
-
-
 
 
 ## Calcul local des coups légaux pour Gopher
@@ -65,6 +64,7 @@ Notre méthode pour déterminer les coups légaux offre un gain significatif en 
 Pourquoi ne pas utiliser la même technique pour Dodo ?
 Dodo est un jeu plus complexe où les jetons peuvent être déplacés d'une case à l'autre, et non seulement placés sur des cases. Stocker la liste complète de tous les coups possibles sous forme de dictionnaire serait donc très coûteux en termes de mémoire. De plus, la complexité de la mise à jour de ce dictionnaire ne justifierait pas l'économie de temps par rapport au calcul direct de la légalité des coups pour toutes les cases.
 
+
 ## Tri des noeuds de l'alpha-beta
 
 En explorant les améliorations possibles de l'algorithme alpha-beta, nous avons découvert qu'il était bénéfique de trier les noeuds (c'est-à-dire les coups testés) de l'alpha-beta. Ce tri permet d'effectuer les coupures alpha ou beta plus rapidement, en testant d'abord les branches les plus prometteuses. Selon l'article de Wikipedia précédemment mentionné, cette optimisation peut réduire le temps de calcul par un facteur significatif :
@@ -80,7 +80,6 @@ Algorithmus	Bewertungen	Cutoffs	Anteil der Cutoffs	Rechenzeit in Sekunden
 
 Lors de la recherche des coups possibles pour un joueur, il est possible de tomber sur des états de jeu déjà rencontrés.  
 Pour éviter de recalculer les coups possibles via notre algorithme alphabeta amélioré, nous avons implémenté une fonction de memoïzation qui permet de stocker le meilleur coup pour un état de jeu déjà rencontré.
-
 
 ### Fonction de hashage des grilles
 
@@ -106,7 +105,7 @@ Donc une amélioration de 40% de la taille de la chaine de caractère et donc pa
 
 ### Gestion des symetries
 
-Une grille hexagonale comporte de nombreux axes de symétries (6 au total), il est donc utile d'implementer un calcule de ces symétries. Nous avons fait le choix d'implementer le calcule des symetries dans notre memoïzation, ainsi à chaque fois qu'une position est memoïzé, les 5 autres positions, symétriques et donc strictements équivalentes sont également ajouté au cache.
+Une grille hexagonale comporte de nombreux axes de symétries (6 au total), il est donc utile d'implémenter un calcul de ces symétries. Nous avons fait le choix d'implémenter le calcul des symetries dans notre memoïzation. Ainsi, à chaque fois qu'une position est memoïzée, les 5 autres positions, symétriques et donc strictements équivalentes, sont également ajoutées au cache.
 La fonction `reflexion()` permet de calculer l'ensemble des symetries pour une grille donnée.
 
 ### Fonction de memoïzation
