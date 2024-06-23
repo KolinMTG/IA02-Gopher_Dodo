@@ -28,6 +28,12 @@ Ce repository est composé de 7 fichiers :
 7. Le fichier `test_client.py` qui permet de jouer sur le serveur avec nos algorithmes
 
 
+## Choix de représentation des données 
+- Coordonnées : 
+![Systeme de coordonnées presenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
+- Représentation par une matrice : 
+![Representation de la grille de taille 7 sous la forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
+
 ## Choix de l'algorithme utilisé 
 
 Pour notre projet nous voulions développer un algorithme capable de gagner des parties tout en gardant une grande rapidité d'exécution, nécessaire pour ne pas être en manque de temps contre d'autres joueurs. Un algorithme `alpha-beta` que nous avons fortement optimisé nous a semblé être une option adaptée. Notamment, la possibilité de choisir la profondeur de l'algorithme nous permet d'obtenir un algorithme efficace et suffisamment rapide pour répondre aux exigences du concours (quitte à diminuer la profondeur).
@@ -37,14 +43,6 @@ Toujours dans une volonté d'améliorer les performances de notre algorithme nou
 - L'implémentation d'une fonction de mémoïzation pour l'algorithme alpha-beta.
 - L'implémentation d'une fonction de tri des nœuds de l'arbre de l'alpha-beta pour faire les coupures alpha et beta plus rapidement comme décrit dans le Wikipédia en version allemande de l'alpha-beta : https://de.wikipedia.org/wiki/Alpha-Beta-Suche 
 - L'implémentation d'une fonction de hashage des grilles de Gopher et Dodo qui permet d'économiser de l'espace mémoire dans le cache des grilles memoïzées.
-
-
-## Choix de représentation des données 
-- Coordonnées : 
-![Systeme de coordonnées presenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
-- Représentation par une matrice : 
-![Representation de la grille de taille 7 sous la forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
-
 
 
 
@@ -78,9 +76,9 @@ Après avoir effectué des recherches sur les amélioration possible à apporter
 Voici ce qui est indiqué dans le Wiki :  
 
 Algorithmus	Bewertungen	Cutoffs	Anteil der Cutoffs	Rechenzeit in Sekunden  
-Minimax	28.018.531	0	0,00 %	134,87 s (Algorithme minmax)  
-AlphaBeta	2.005.246	136.478	91,50 %	9,88 s (Algorithme alpha-beta)
-AlphaBeta + Zugsortierung	128.307	27.025	99,28 %	0,99 s (Algorithme alpha-beta avec tri des noeuds)
+**Minimax**	28.018.531	0	0,00 %	134,87 s (Algorithme minmax)  
+**AlphaBeta**	2.005.246	136.478	91,50 %	9,88 s (Algorithme alpha-beta)  
+**AlphaBeta + Zugsortierung**	128.307	27.025	99,28 %	0,99 s (Algorithme alpha-beta avec tri des noeuds)  
 
 
 ## Implementation de la memoïzation pour les joueurs
@@ -103,6 +101,11 @@ Nous utilison la fonction `hashing` qui prend en paramètre la grille actuelle d
 Nous obtenons alors un grand nombre représentant l'état de la grille à un moment donné. Ce nombre est ensuite converti de la base 10 à la base 64 (fonction `base64`) pour obtenir une chaine de caractère plus courte. Nous occupons ainsi moins de place en mémoire.
 
 `hashing` renvoie alors la chaine de caractère convertie précédemment en base 64. Pour information, nous utilisons l'alphabet suivant : `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,`.
+
+### Gestion des symetries
+
+Une grille hexagonale comporte de nombreux axes de symétries (6 au total), il est donc utile d'implementer un calcule de ces symétries. Nous avons fait le choix d'implementer le calcule des symetries dans notre memoïzation, ainsi à chaque fois qu'une position est memoïzé, les 5 autres positions, symétriques et donc strictements équivalentes sont également ajouté au cache.
+La fonction `reflexion()` permet de calculer l'ensemble des symetries pour une grille donnée.
 
 ### Fonction de memoïzation
 
