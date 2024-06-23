@@ -16,10 +16,10 @@ L'objectif de ce projet était de coder des algorithmes capables de jouer aux je
 Par la suite, les differents algorithmes codés par les étudiants se sont affronté lors d'un tournoi résalisé par l'intermediaire d'un serveur en ligne. Les differents joueurs ont également un temps limité pour donner leurs coups, la rapidité et l'optimisation 
 des algorithmes est donc de mise.
 
-## Structure gobale 
+## Structure globale 
 
 Ce repository est composé de 7 fichiers : 
-1. Le Readme ci-present
+1. Le `Readme.md`, read me ci-present
 2. Le fichier `gnd.client.py` qui implemente les fonctionnalitées du serveur
 3. Le fichier `gndserver.exe` qui doit etre executé pour lancer le serveur
 4. Le fichier `affichage.py` qui implemente un affichage "userfriendly" des jeu
@@ -28,6 +28,7 @@ Ce repository est composé de 7 fichiers :
 7. Le fichier `test_client.py` qui permet de jouer sur le serveur avec nos algorithmes
 
 
+## Choix de l'agorithme utilisé 
 
 
 
