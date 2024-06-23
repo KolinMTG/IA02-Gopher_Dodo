@@ -104,7 +104,7 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         environement["player_we_are"] = player
         environement["premier_coup"] = True
         environement["is_odd"] = True if hex_size % 2 == 1  and hex_size >= 5 else False #booleen qui determine si la taille de la grille est pair ou impaire
-        environement["depth"] = 7
+        environement["depth"] = 9
         #pour l'implementation des differentes strategies du jeu en fonction de la taille de la grille
         print("Initialisation terminé pour le jeu Gopher de taille ", hex_size)
         print("Environement actuel : ", environement)
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     parser.add_argument("group_id")
     parser.add_argument("members")
     parser.add_argument("password")
-    parser.add_argument("-s", "--server-url", default="http://localhost:8080/")
+    parser.add_argument("-s", "--server-url", default="http://lagrue.ninja/")
     parser.add_argument("-d", "--disable-dodo", action="store_true")
     parser.add_argument("-g", "--disable-gopher", action="store_true")
     args = parser.parse_args()
