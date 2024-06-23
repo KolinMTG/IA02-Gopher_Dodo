@@ -33,18 +33,20 @@ Ce repository est composé de 7 fichiers :
 Pour notre projet nous voulons un algorithme capable de gagner des partie tout en gardant une grande rapidité d'action, necessaire pour ne pas etre en manque de temps contre d'autre joueur. Un algorithme `alpha-beta` que nous avons fortement optimisé nous a semblé être une option adaptée. Notement, la possibilité de choisir la profondeur de l'argorithme nous permet d'obtenir un algorithme efficasse et suffisement rapide pour repondre au exigences du concour (quitte a diminuer la profondeur).
 
 Toujours dans une volonté d'ameliorer la performance de notre algorithme nous avons implementé de nombreuses optimisations que nous allons detailler :
-- Le calcule uniquement local des coups legaux pour l'agorithme de gopher afin d'economiser du temps de calcule
-- L'implementation d'une fonction de memoïzation pour l'algorithme alpha-beta
-- L'implementation d'une fonction de tri des noeuds de l'arbre du alpha-beta pour faire les coupures alpha et beta plus rapidement comme decrit dans le Wikipédia en version allemande du alpha-beta : https://de.wikipedia.org/wiki/Alpha-Beta-Suche 
-- L'implementation d'une fonction de hashage des grilles de Gopher et Dodo qui permet d'économiser de l'espace mémoire dans le cache des grilles memoïzées
+- Le **calcule local des coups legaux** pour l'agorithme de gopher afin d'economiser du temps de calcule
+- L'implementation d'une **fonction de memoïzation** pour l'algorithme alpha-beta
+- L'implementation d'une **fonction de tri des noeuds** de l'arbre du alpha-beta pour faire les coupures alpha et beta plus rapidement comme decrit dans le Wikipédia en version allemande du alpha-beta : https://de.wikipedia.org/wiki/Alpha-Beta-Suche 
+- L'implementation d'une **fonction de hashage** des grilles de Gopher et Dodo qui permet d'économiser de l'espace mémoire dans le cache des grilles memoïzées
 
 
 ## Choix de representation des données 
+
+La representation de la grille hexagonale du jeu est plus ou moins imposé, en effets, nous devons renvoyer les coups au serveurs selon un système de coordonnée prédéfini. Par soucis de simplicité nous avons gardés ce système de coordonnée sur tout notre projet. Voici le sysmtème de coordonné choisit et la representation de la grille.
+
 - Coordonnées : 
 ![Systeme de coordonnée presenté pour une grille de taille 7](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/grid_hex.png)
 - Representation par une matrice : 
 ![Representation de la grille de taille 7 sous la forme d'une matrice 2D](https://moodle.utc.fr/pluginfile.php/335042/mod_label/intro/matrix_hex.png)
-
 
 
 
@@ -69,7 +71,7 @@ Dodo est un jeu, plus complexe car les jetons ne sont pas uniquement placés sur
 
 ## Implementation de la memoïzation pour les joueurs 
 
-
+## 
 
 ## Utilisation du server
 
