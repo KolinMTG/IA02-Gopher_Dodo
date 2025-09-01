@@ -1,10 +1,5 @@
 # Projet IA02
 
-## Auteurs
-
-Bastien Cuvillier, Colin Manyri
-
-
 ## Introduction
 
 Ce projet a été réalisé dans le cadre de la formation d'ingénieur en Génie Informatique à l'Université de Technologie de Compiègne (UTC) et plus précisément dans le cadre de l'UV IA02 : Logique et Résolution de problèmes par la recherche.
@@ -193,3 +188,15 @@ Nous avions considéré l'utilisation du multicoeur pour l'exécution de tous le
 
 Malgré le fait que notre programme fonctionne sans problèmes en local, nous avons rencontré des problèmes lors de l'utilisation du serveur pendant le tournoi. Il semblerait que notre programme renvoyait des coups illégaux alors que ce problème ne s'était jamais manifesté en local à la fois via notre boucle de jeu maison et à la fois via la boucle de jeu du serveur.
 Nous n'avons pas réussi à trouver la source du problème.
+
+
+## En cas de problèmes
+
+Tout le code s'execute normalement sans bugs. En cas de problèmes, n'hésitez pas à nous contacter aux adresses mails suivantes :
+- colin.manyri@etu.utc.fr
+- bastien.cuvillier@etu.utc.fr
+
+## Auteurs
+
+- Bastien Cuvillier (https://github.com/Voln1x)
+- Colin Manyri (https://github.com/KolinMTG)
